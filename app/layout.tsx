@@ -4,6 +4,8 @@ import './globals.css';
 import React from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { cookies } from 'next/headers';
+import Navbar from '@/components/navbar';
+import ThemeProvider from '@/components/theme-provider';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -33,7 +35,15 @@ export default async function RootLayout({
     >
       <body>
         <NextIntlClientProvider>
-          <div className="m-12">{children}</div>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Navbar />
+            {children}
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>

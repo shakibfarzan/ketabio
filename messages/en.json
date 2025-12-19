@@ -2,7 +2,16 @@
   "General": {
     "viewDetails": "View Details",
     "viewAllBooks": "View All Books",
-    "appTitle": "Ketabio"
+    "appTitle": "Ketabio",
+    "books": "Books",
+    "categories": "Categories",
+    "about": "About",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "toggleTheme": "Toggle theme",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",

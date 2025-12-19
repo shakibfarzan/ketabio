@@ -2,7 +2,16 @@
   "General": {
     "viewDetails": "مشاهده جزئیات",
     "viewAllBooks": "مشاهده همه کتابها",
-    "appTitle": "کتابیو"
+    "appTitle": "کتابیو",
+    "books": "کتاب ها",
+    "categories": "دسته بندی ها",
+    "about": "درباره",
+    "login": "ورود",
+    "signUp": "ثبت نام",
+    "toggleTheme": "تغییر تم",
+    "dark": "تیره",
+    "light": "روشن",
+    "system": "سیستم"
   },
   "LandingPage": {
     "title": "کتاب های مورد علاقه تان، فقط چند کلیک فاصله دارند",

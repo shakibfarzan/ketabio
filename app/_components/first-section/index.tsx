@@ -1,10 +1,11 @@
 import React from 'react';
 import LeftSection from '@/app/_components/first-section/left-section';
 import Image from 'next/image';
+import Container from '@/components/container';
 
 const FirstSection: React.FC = () => {
   return (
-    <div className="flex flex-col lg:flex-row gap-8 items-center justify-between w-full">
+    <Container className="flex flex-col lg:flex-row gap-8 items-center justify-between">
       <LeftSection />
       <div className="relative lg:w-2/3 w-full aspect-video">
         <Image
@@ -15,7 +16,7 @@ const FirstSection: React.FC = () => {
           sizes="100vw"
         />
       </div>
-    </div>
+    </Container>
   );
 };
 
