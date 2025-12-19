@@ -1,5 +1,36 @@
 {
+  "General": {
+    "viewDetails": "View Details",
+    "viewAllBooks": "View All Books",
+    "appTitle": "Ketabio"
+  },
   "LandingPage": {
-    "title": "Your favorite books, just a few clicks away"
+    "title": "Your favorite books, just a few clicks away",
+    "description": "Search, borrow, and explore thousands of books anytime, anywhere.",
+    "browseBooks": "Browse Books",
+    "joinNow": "Join Now",
+    "questionText": "Why Choose Ketabio?",
+    "2ndDescription": "Everything you need for the perfect reading experience",
+    "1stCardTitle": "Extensive Book Collection",
+    "1stCardDesc": "Access books from multiple genres and authors.",
+    "2ndCardTitle": "Fast & Smart Search",
+    "2ndCardDesc": "Find the right book in seconds with powerful search tools.",
+    "3rdCardTitle": "Easy Borrowing Process",
+    "3rdCardDesc": "Borrow or reserve books with a simple, intuitive flow.",
+    "4thCardTitle": "Reviews & Ratings",
+    "4thCardDesc": "Make better choices by reading community reviews.",
+    "3rdTitle": "Featured Books",
+    "3rdDescription": "Discover our handpicked selection",
+    "4thTitle": "How It Works",
+    "4thDescription": "Start your reading journey in three simple steps",
+    "1stLvlTitle": "Create an account",
+    "1stLvlDesc": "Sign up for free and get instant access to our entire collection",
+    "2ndLvlTitle": "Search and select a book",
+    "2ndLvlDesc": "Browse through thousands of titles and find your next favorite read",
+    "3rdLvlTitle": "Borrow and start reading",
+    "3rdLvlDesc": "Enjoy your book instantly on any device, anytime, anywhere",
+    "5thTitle": "Ready to start your reading journey?",
+    "5thDescription": "Join thousands of readers who have already discovered their next favorite book",
+    "createYourFreeAccount": "Create Your Free Account"
   }
 }
