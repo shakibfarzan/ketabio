@@ -32,15 +32,11 @@ export default async function RootLayout({
       lang={locale}
       dir={isPersian ? 'rtl' : 'ltr'}
       className={isPersian ? vazirMatn.className : poppins.className}
+      suppressHydrationWarning
     >
       <body>
         <NextIntlClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <Navbar />
             {children}
           </ThemeProvider>
