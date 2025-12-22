@@ -11,7 +11,8 @@
     "toggleTheme": "Toggle theme",
     "dark": "Dark",
     "light": "Light",
-    "system": "System"
+    "system": "System",
+    "byAuthor": "by {author}"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",

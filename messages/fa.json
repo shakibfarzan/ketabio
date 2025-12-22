@@ -11,7 +11,8 @@
     "toggleTheme": "تغییر تم",
     "dark": "تیره",
     "light": "روشن",
-    "system": "سیستم"
+    "system": "سیستم",
+    "byAuthor": "توسط {author}"
   },
   "LandingPage": {
     "title": "کتاب های مورد علاقه تان، فقط چند کلیک فاصله دارند",
