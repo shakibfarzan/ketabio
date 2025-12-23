@@ -2,6 +2,9 @@ import React from 'react';
 import Container from '@/components/container';
 import { useTranslations } from 'next-intl';
 import FeaturedBookCard from '@/app/_components/third-section/featured-book-card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 
 const mockDatum = {
   title: 'Book Cover',
@@ -14,6 +17,7 @@ const mockData = [mockDatum, mockDatum, mockDatum, mockDatum, mockDatum, mockDat
 
 const ThirdSection: React.FC = () => {
   const t = useTranslations('LandingPage');
+  const tGeneral = useTranslations('General');
   return (
     <Container className="flex flex-col gap-6 items-center">
       <h2 className="text-4xl font-semibold">{t('3rdTitle')}</h2>
@@ -23,6 +27,12 @@ const ThirdSection: React.FC = () => {
           <FeaturedBookCard key={d.slug + index} {...d} />
         ))}
       </div>
+      <Button size="lg" variant="outline" asChild className="mt-6">
+        <Link href="/books">
+          {tGeneral('viewAllBooks')}
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Link>
+      </Button>
     </Container>
   );
 };
