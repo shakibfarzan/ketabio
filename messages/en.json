@@ -15,7 +15,8 @@
     "byAuthor": "by {author}",
     "English": "English",
     "Persian": "Persian",
-    "switchLanguage": "Switch Language"
+    "switchLanguage": "Switch Language",
+    "library": "Library"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
@@ -45,5 +46,12 @@
     "5thTitle": "Ready to start your reading journey?",
     "5thDescription": "Join thousands of readers who have already discovered their next favorite book",
     "createYourFreeAccount": "Create Your Free Account"
+  },
+  "Footer": {
+    "description": "Your digital library for endless reading possibilities.",
+    "support": "Support",
+    "contact": "Contact",
+    "helpCenter": "Help Center",
+    "connect": "Connect"
   }
 }
