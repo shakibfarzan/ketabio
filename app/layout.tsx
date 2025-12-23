@@ -5,7 +5,7 @@ import React from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { cookies } from 'next/headers';
 import Navbar from '@/components/navbar';
-import ThemeProvider from '@/components/theme-provider';
+import ThemeProvider from '@/providers/theme-provider';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],

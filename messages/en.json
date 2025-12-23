@@ -12,7 +12,10 @@
     "dark": "Dark",
     "light": "Light",
     "system": "System",
-    "byAuthor": "by {author}"
+    "byAuthor": "by {author}",
+    "English": "English",
+    "Persian": "Persian",
+    "switchLanguage": "Switch Language"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",

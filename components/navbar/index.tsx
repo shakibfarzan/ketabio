@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import NavItem from '@/components/navbar/nav-item';
 import ModeToggle from '@/components/navbar/mode-toggle';
-import { useTheme } from 'next-themes';
+import SwitchLocale from '@/components/navbar/switch-locale';
 
 const Navbar: React.FC = () => {
   const t = useTranslations('General');
@@ -34,6 +34,7 @@ const Navbar: React.FC = () => {
         </nav>
 
         <div className="flex items-center gap-3">
+          <SwitchLocale />
           <ModeToggle />
           <Button variant="ghost" asChild>
             <Link href="/">{t('login')}</Link>

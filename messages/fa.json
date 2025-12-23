@@ -12,7 +12,10 @@
     "dark": "تیره",
     "light": "روشن",
     "system": "سیستم",
-    "byAuthor": "توسط {author}"
+    "byAuthor": "توسط {author}",
+    "English": "انگلیسی",
+    "Persian": "فارسی",
+    "switchLanguage": "تغییر زبان"
   },
   "LandingPage": {
     "title": "کتاب های مورد علاقه تان، فقط چند کلیک فاصله دارند",
