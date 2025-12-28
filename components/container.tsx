@@ -7,7 +7,7 @@ type Props = {
 };
 
 const Container: React.FC<Props> = ({ className, children }) => {
-  return <section className={cn('p-12', className)}>{children}</section>;
+  return <section className={cn('px-12 py-16', className)}>{children}</section>;
 };
 
 export default Container;

@@ -1,4 +1,3 @@
-'use client';
 import Link from 'next/link';
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,9 @@ import { useTranslations } from 'next-intl';
 import NavItem from '@/components/navbar/nav-item';
 import ModeToggle from '@/components/navbar/mode-toggle';
 import SwitchLocale from '@/components/navbar/switch-locale';
+import routes from '@/constants/routes';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { shadcn } from '@clerk/themes';
 
 const Navbar: React.FC = () => {
   const t = useTranslations('General');
@@ -27,7 +29,9 @@ const Navbar: React.FC = () => {
           width={180}
           height={20}
         />
+
         <nav className="hidden md:flex items-center gap-6">
+          <NavItem href="/" title={t('home')} />
           <NavItem href="/" title={t('books')} />
           <NavItem href="/" title={t('categories')} />
           <NavItem href="/" title={t('about')} />
@@ -36,12 +40,17 @@ const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <SwitchLocale />
           <ModeToggle />
-          <Button variant="ghost" asChild>
-            <Link href="/">{t('login')}</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/">{t('signUp')}</Link>
-          </Button>
+          <SignedIn>
+            <UserButton appearance={{ theme: shadcn }} />
+          </SignedIn>
+          <SignedOut>
+            <Button variant="ghost" asChild>
+              <Link href={routes.AUTH.LOGIN}>{t('login')}</Link>
+            </Button>
+            <Button asChild>
+              <Link href={routes.AUTH.SIGN_UP}>{t('signUp')}</Link>
+            </Button>
+          </SignedOut>
         </div>
       </div>
     </header>
