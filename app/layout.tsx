@@ -8,6 +8,7 @@ import Navbar from '@/components/navbar';
 import ThemeProvider from '@/providers/theme-provider';
 import Footer from '@/components/footer';
 import { ClerkProvider } from '@clerk/nextjs';
+import { enUS, faIR } from '@clerk/localizations';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -29,8 +30,9 @@ export default async function RootLayout({
   const store = await cookies();
   const locale = store.get('locale')?.value || 'en';
   const isPersian = locale === 'fa';
+  const clerkLocale = isPersian ? faIR : enUS;
   return (
-    <ClerkProvider>
+    <ClerkProvider localization={clerkLocale}>
       <html
         lang={locale}
         dir={isPersian ? 'rtl' : 'ltr'}
