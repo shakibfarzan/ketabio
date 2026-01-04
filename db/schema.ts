@@ -1,4 +1,13 @@
-import { integer, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 export const userRoleEnum = pgEnum('user_role', ['member', 'admin']);
 
@@ -20,24 +29,36 @@ export const authors = pgTable('authors', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
-export const categories = pgTable('categories', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  name: text('name').notNull().unique(),
-  slug: text('slug').notNull().unique(),
-});
+export const categories = pgTable(
+  'categories',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    name: text('name').notNull().unique(),
+    slug: text('slug').notNull().unique(),
+  },
+  (t) => [index('categories_slug_idx').on(t.slug)]
+);
 
-export const books = pgTable('books', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  title: text('title').notNull(),
-  slug: text('slug').notNull().unique(),
-  description: text('description'),
-  coverImage: text('cover_image'),
-  language: text('language'),
-  pageCount: integer('page_count'),
-  publishedAt: timestamp('published_at'),
-  authorId: uuid('author_id').references(() => authors.id),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+export const books = pgTable(
+  'books',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    title: text('title').notNull(),
+    slug: text('slug').notNull().unique(),
+    description: text('description'),
+    coverImage: text('cover_image'),
+    language: text('language'),
+    pageCount: integer('page_count'),
+    publishedAt: timestamp('published_at'),
+    authorId: uuid('author_id').references(() => authors.id),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (t) => [
+    index('books_slug_idx').on(t.slug),
+    index('books_author_idx').on(t.authorId),
+    index('books_created_at_idx').on(t.createdAt),
+  ]
+);
 
 export const bookCategories = pgTable(
   'book_categories',
