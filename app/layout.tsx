@@ -10,6 +10,7 @@ import Footer from '@/components/footer';
 import { ClerkProvider } from '@clerk/nextjs';
 import { enUS, faIR } from '@clerk/localizations';
 import { getOrCreateUser } from '@/utils/auth';
+import { ROLES } from '@/db/schema';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -32,8 +33,6 @@ export default async function RootLayout({
   const locale = store.get('locale')?.value || 'en';
   const isPersian = locale === 'fa';
   const clerkLocale = isPersian ? faIR : enUS;
-  const user = await getOrCreateUser();
-  console.log(user);
   return (
     <ClerkProvider localization={clerkLocale}>
       <html
