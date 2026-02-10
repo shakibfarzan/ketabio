@@ -12,7 +12,7 @@ export default async function Page() {
   const user = await getOrCreateUser();
   const isAdmin = user?.role === ROLES.ADMIN;
 
-  if (isAdmin) redirect(routes.ADMIN);
+  if (isAdmin) redirect(routes.ADMIN.BOOKS);
 
   return (
     <>

@@ -17,7 +17,12 @@
     "Persian": "Persian",
     "switchLanguage": "Switch Language",
     "library": "Library",
-    "home": "Home"
+    "home": "Home",
+    "booksManagement": "Books Management",
+    "addBook": "Add Book",
+    "clickImage": "Click or drag image to upload",
+    "preview": "Preview",
+    "change": "Change"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
@@ -54,5 +59,15 @@
     "contact": "Contact",
     "helpCenter": "Help Center",
     "connect": "Connect"
+  },
+  "Forms": {
+    "isRequired": "This field is required",
+    "minLength": "Must be at least 2 characters",
+    "invalidUrl": "Invalid URL",
+    "mustBeNumber": "Must be a number",
+    "mustBeInteger": "Must be an integer",
+    "mustBePositive": "Must be a positive number",
+    "invalidDate": "Invalid date",
+    "invalidUuid": "Invalid identifier"
   }
 }

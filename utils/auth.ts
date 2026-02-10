@@ -23,7 +23,6 @@ export const getOrCreateUser = async () => {
     avatarUrl: clerkUser.imageUrl,
   };
 
-  // 1️⃣ Update existing user
   if (user) {
     const [updated] = await db
       .update(users)
