@@ -20,7 +20,7 @@
     "home": "Home",
     "booksManagement": "Books Management",
     "addBook": "Add Book",
-    "clickImage": "Click or drag image to upload",
+    "clickFile": "Click or drag file here",
     "preview": "Preview",
     "change": "Change"
   },

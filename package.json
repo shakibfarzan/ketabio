@@ -30,6 +30,7 @@
     "react": "^19.2.3",
     "react-day-picker": "^9.13.1",
     "react-dom": "^19.2.3",
+    "react-dropzone": "^15.0.0",
     "react-hook-form": "^7.71.1",
     "shadcn": "^3.6.1",
     "svix": "^1.84.1",
