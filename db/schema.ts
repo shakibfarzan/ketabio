@@ -15,6 +15,7 @@ export const ROLES = {
 } as const;
 
 export const userRoleEnum = pgEnum('user_role', ['member', 'admin']);
+export const bookFormatEnum = pgEnum('book_format', ['pdf', 'epub', 'mobi', 'audio']);
 
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
@@ -63,6 +64,22 @@ export const books = pgTable(
     index('books_author_idx').on(t.authorId),
     index('books_created_at_idx').on(t.createdAt),
   ]
+);
+
+export const bookFiles = pgTable(
+  'book_files',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    bookId: integer('book_id')
+      .notNull()
+      .references(() => books.id, { onDelete: 'cascade' }),
+    format: bookFormatEnum('format').notNull(),
+    fileUrl: text('file_url').notNull(),
+    fileSize: integer('file_size'), // bytes
+    version: integer('version').default(1),
+    createdAt: timestamp('created_at').defaultNow(),
+  },
+  (t) => [index('book_files_book_idx').on(t.bookId), index('book_files_format_idx').on(t.format)]
 );
 
 export const bookCategories = pgTable(

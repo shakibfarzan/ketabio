@@ -22,7 +22,8 @@
     "addBook": "Add Book",
     "clickFile": "Click or drag file here",
     "preview": "Preview",
-    "change": "Change"
+    "change": "Change",
+    "dropFiles": "Drop files here"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",

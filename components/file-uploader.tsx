@@ -1,43 +1,45 @@
 import * as React from 'react';
 import { useDropzone, Accept } from 'react-dropzone';
 import { Upload, X, File as FileIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 
 type FileUploaderProps = {
-  value: File | null;
-  onChange: (file: File | null) => void;
+  value: File[];
+  onChange: (files: File[]) => void;
   accept?: Accept;
   maxSizeMB?: number;
+  maxFiles?: number;
 };
 
-const FileUploader: React.FC<FileUploaderProps> = ({ value, onChange, accept, maxSizeMB = 5 }) => {
+const FileUploader: React.FC<FileUploaderProps> = ({
+  value = [],
+  onChange,
+  accept,
+  maxSizeMB = 5,
+  maxFiles,
+}) => {
   const t = useTranslations('General');
-  const file = value;
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept,
     maxSize: maxSizeMB * 1024 * 1024,
-    multiple: false,
+    multiple: true,
+    maxFiles,
     onDrop: (acceptedFiles) => {
-      onChange(acceptedFiles[0] ?? null);
+      const updatedFiles = [...value, ...acceptedFiles];
+      onChange(updatedFiles);
     },
   });
 
-  const isImage = file?.type.startsWith('image/');
-  const preview = isImage && file ? URL.createObjectURL(file) : null;
+  const removeFile = (index: number) => {
+    const updated = value.filter((_, i) => i !== index);
+    onChange(updated);
+  };
 
-  React.useEffect(() => {
-    return () => {
-      if (preview) URL.revokeObjectURL(preview);
-    };
-  }, [preview]);
-
-  if (!file) {
-    return (
+  return (
+    <div className="space-y-4">
       <div
         {...getRootProps()}
-        className={`flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed transition
+        className={`flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed transition
           ${
             isDragActive
               ? 'border-primary bg-primary/10'
@@ -46,33 +48,44 @@ const FileUploader: React.FC<FileUploaderProps> = ({ value, onChange, accept, ma
       >
         <input {...getInputProps()} />
         <Upload className="mb-2 h-6 w-6 text-muted-foreground" />
-        <p className="text-sm text-muted-foreground">{t('clickFile')}</p>
+        <p className="text-sm text-muted-foreground">
+          {isDragActive ? t('dropFiles') : t('clickFile')}
+        </p>
       </div>
-    );
-  }
 
-  return (
-    <div className="relative flex h-40 w-full items-center justify-center overflow-hidden rounded-xl border bg-muted/30">
-      {preview ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={preview} alt="preview" className="h-full w-full object-cover" />
-      ) : (
-        <div className="flex flex-col items-center text-center">
-          <FileIcon className="mb-2 h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium">{file.name}</p>
-          <p className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+      {value.length > 0 && (
+        <div className="grid grid-cols-2 gap-4">
+          {value.map((file, index) => {
+            const isImage = file.type.startsWith('image/');
+            const preview = isImage ? URL.createObjectURL(file) : null;
+
+            return (
+              <div
+                key={index}
+                className="relative flex h-32 items-center justify-center overflow-hidden rounded-xl border bg-muted/30"
+              >
+                {preview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={preview} alt={file.name} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center text-center px-2">
+                    <FileIcon className="mb-1 h-6 w-6 text-muted-foreground" />
+                    <p className="text-xs font-medium truncate w-full">{file.name}</p>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => removeFile(index)}
+                  className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
-
-      <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 opacity-0 transition hover:opacity-100">
-        <Button size="sm" variant="secondary" type="button" onClick={() => onChange(null)}>
-          {t('change')}
-        </Button>
-
-        <Button size="sm" variant="destructive" type="button" onClick={() => onChange(null)}>
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
     </div>
   );
 };
