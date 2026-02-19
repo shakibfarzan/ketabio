@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import RequiredSign from '@/components/form/required-sign';
 
 type Option = {
   label: string | ((value: string) => React.ReactNode);
@@ -21,14 +22,25 @@ type Props = FormProps & {
   className?: string;
 };
 
-const FormSelect: React.FC<Props> = ({ options, placeholder, label, name, control, className }) => {
+const FormSelect: React.FC<Props> = ({
+  options,
+  placeholder,
+  label,
+  name,
+  control,
+  className,
+  isRequired,
+}) => {
   return (
     <Controller
       name={name}
       control={control}
       render={({ field, fieldState }) => (
         <Field orientation="vertical" data-invalid={fieldState.invalid}>
-          <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+          <FieldLabel htmlFor={field.name}>
+            {label}
+            {isRequired && <RequiredSign />}
+          </FieldLabel>
           <Select name={field.name} value={field.value} onValueChange={field.onChange}>
             <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className={className}>
               <SelectValue placeholder={placeholder} />

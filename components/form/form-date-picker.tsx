@@ -1,18 +1,23 @@
+'use client';
 import * as React from 'react';
 import { Controller } from 'react-hook-form';
 import { format } from 'date-fns';
+import { faIR } from 'react-day-picker/locale';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { FormProps } from '@/components/form/types';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { useLocale } from 'use-intl';
 
 type Props = FormProps & {
   placeholder?: string;
 };
 
 const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder }) => {
+  const locale = useLocale();
+  const isPersian = locale === 'fa';
   return (
     <Controller
       name={name}
@@ -26,7 +31,7 @@ const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder }) 
                 variant="outline"
                 id={field.name}
                 aria-invalid={fieldState.invalid}
-                className="w-full justify-start text-left font-normal"
+                className="w-full justify-start text-left font-normal bg-transparent"
               >
                 {field.value ? (
                   format(field.value, 'PPP')
@@ -41,6 +46,8 @@ const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder }) 
                 selected={field.value ?? undefined}
                 onSelect={field.onChange}
                 autoFocus
+                locale={isPersian ? faIR : undefined}
+                captionLayout="dropdown"
               />
             </PopoverContent>
           </Popover>
