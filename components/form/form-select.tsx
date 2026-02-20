@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import RequiredSign from '@/components/form/required-sign';
+import { useLocale } from 'use-intl';
 
 type Option = {
   label: string | ((value: string) => React.ReactNode);
@@ -31,6 +32,8 @@ const FormSelect: React.FC<Props> = ({
   className,
   isRequired,
 }) => {
+  const locale = useLocale();
+  const isPersian = locale === 'fa';
   return (
     <Controller
       name={name}
@@ -41,7 +44,12 @@ const FormSelect: React.FC<Props> = ({
             {label}
             {isRequired && <RequiredSign />}
           </FieldLabel>
-          <Select name={field.name} value={field.value} onValueChange={field.onChange}>
+          <Select
+            dir={isPersian ? 'rtl' : 'ltr'}
+            name={field.name}
+            value={field.value}
+            onValueChange={field.onChange}
+          >
             <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className={className}>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>

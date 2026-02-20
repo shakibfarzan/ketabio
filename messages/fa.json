@@ -23,7 +23,9 @@
     "clickFile": "فایل را اینجا کلیک کنید یا بکشید",
     "preview": "پیش‌نمایش",
     "change": "تغییر",
-    "dropFiles": "فایل ها را اینجا رها کنید"
+    "dropFiles": "فایل ها را اینجا رها کنید",
+    "save": "ذخیره",
+    "cancel": "لغو"
   },
   "LandingPage": {
     "title": "کتاب های مورد علاقه تان، فقط چند کلیک فاصله دارند",
@@ -70,5 +72,25 @@
     "mustBePositive": "باید عددی بزرگ‌تر از صفر باشد",
     "invalidDate": "تاریخ وارد شده معتبر نیست",
     "invalidUuid": "شناسه معتبر نیست"
+  },
+  "BookForm": {
+    "bookInformation": "اطلاعات کتاب",
+    "title": "عنوان",
+    "titlePlaceholder": "عنوان کتاب را وارد کنید",
+    "author": "نویسنده",
+    "authorPlaceholder": "نام نویسنده را انتخاب کنید",
+    "description": "توضیحات",
+    "descriptionPlaceholder": "توضیحات کتاب را وارد کنید",
+    "category": "دسته",
+    "categoryPlaceholder": "دسته را انتخاب کنید",
+    "language": "زبان",
+    "languagePlaceholder": "زبان را انتخاب کنید",
+    "publishedAt": "تاریخ انتشار",
+    "publishedAtPlaceholder": "تاریخ انتشار را وارد کنید",
+    "pageCount": "تعداد صفحات",
+    "pageCountPlaceholder": "تعداد صفحات را وارد کنید",
+    "isbnPlaceholder": "ISBN را وارد کنید",
+    "coverImage": "تصویر جلد",
+    "bookFile": "فایل کتاب"
   }
 }

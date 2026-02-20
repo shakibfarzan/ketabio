@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useDropzone, Accept } from 'react-dropzone';
 import { Upload, X, File as FileIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
 
 type FileUploaderProps = {
   value: File[];
@@ -16,16 +17,16 @@ const FileUploader: React.FC<FileUploaderProps> = ({
   onChange,
   accept,
   maxSizeMB = 5,
-  maxFiles,
+  maxFiles = 1,
 }) => {
   const t = useTranslations('General');
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept,
     maxSize: maxSizeMB * 1024 * 1024,
-    multiple: true,
+    multiple: maxFiles > 1,
     maxFiles,
     onDrop: (acceptedFiles) => {
-      const updatedFiles = [...value, ...acceptedFiles];
+      const updatedFiles = maxFiles === 1 ? [...acceptedFiles] : [...value, ...acceptedFiles];
       onChange(updatedFiles);
     },
   });
@@ -62,11 +63,20 @@ const FileUploader: React.FC<FileUploaderProps> = ({
             return (
               <div
                 key={index}
-                className="relative flex h-32 items-center justify-center overflow-hidden rounded-xl border bg-muted/30"
+                className={cn(
+                  'relative flex items-center justify-center overflow-hidden rounded-xl border bg-muted/30',
+                  {
+                    'h-32': !preview,
+                  }
+                )}
               >
                 {preview ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={preview} alt={file.name} className="h-full w-full object-cover" />
+                  <img
+                    src={preview}
+                    alt={file.name}
+                    className="h-full max-w-[15rem] object-cover"
+                  />
                 ) : (
                   <div className="flex flex-col items-center text-center px-2">
                     <FileIcon className="mb-1 h-6 w-6 text-muted-foreground" />
@@ -77,7 +87,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({
                 <button
                   type="button"
                   onClick={() => removeFile(index)}
-                  className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white"
+                  className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>

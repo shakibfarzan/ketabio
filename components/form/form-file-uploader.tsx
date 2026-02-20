@@ -9,6 +9,7 @@ type Props = FormProps & {
   accept?: Accept;
   maxSizeMB?: number;
   maxFiles?: number;
+  labelClassName?: string;
 };
 
 const FormFileUploader: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const FormFileUploader: React.FC<Props> = ({
   accept,
   maxSizeMB,
   maxFiles,
+  labelClassName = '',
 }) => {
   return (
     <Controller
@@ -26,7 +28,7 @@ const FormFileUploader: React.FC<Props> = ({
       defaultValue={[]}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
-          <FieldLabel>{label}</FieldLabel>
+          <FieldLabel className={labelClassName}>{label}</FieldLabel>
 
           <FileUploader
             value={field.value || []}

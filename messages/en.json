@@ -23,7 +23,9 @@
     "clickFile": "Click or drag file here",
     "preview": "Preview",
     "change": "Change",
-    "dropFiles": "Drop files here"
+    "dropFiles": "Drop files here",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
@@ -70,5 +72,25 @@
     "mustBePositive": "Must be a positive number",
     "invalidDate": "Invalid date",
     "invalidUuid": "Invalid identifier"
+  },
+  "BookForm": {
+    "bookInformation": "Book Information",
+    "title": "Title",
+    "titlePlaceholder": "Enter book title",
+    "author": "Author",
+    "authorPlaceholder": "Select author name",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter book description",
+    "category": "Category",
+    "categoryPlaceholder": "Select category",
+    "language": "Language",
+    "languagePlaceholder": "Select language",
+    "publishedAt": "Publication Date",
+    "publishedAtPlaceholder": "Enter publication date",
+    "pageCount": "Page Count",
+    "pageCountPlaceholder": "Enter page count",
+    "isbnPlaceholder": "Enter ISBN",
+    "coverImage": "Cover Image",
+    "bookFile": "Book File"
   }
 }
