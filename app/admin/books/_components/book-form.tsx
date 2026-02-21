@@ -1,14 +1,16 @@
 'use client';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import FormInput from '@/components/form/form-input';
 import { FieldValues, FormProvider, useForm, useFormContext } from 'react-hook-form';
-import FormSelect from '@/components/form/form-select';
+import FormSelect, { Option } from '@/components/form/form-select';
 import FormTextarea from '@/components/form/form-textarea';
 import FormDatePicker from '@/components/form/form-date-picker';
 import { useTranslations } from 'next-intl';
 import FormFileUploader from '@/components/form/form-file-uploader';
 import { Button } from '@/components/ui/button';
+import useLanguages from '@/hooks/useLanguages';
+import FormMultiSelect from '@/components/form/form-multi-select';
 
 const BookForm: React.FC = () => {
   const methods = useForm<FieldValues>({
@@ -25,6 +27,7 @@ const BookForm: React.FC = () => {
       coverImage: null,
     },
   });
+
   const { handleSubmit } = methods;
   return (
     <div className="">
@@ -46,6 +49,11 @@ const BookForm: React.FC = () => {
 const LeftSideForm: React.FC = () => {
   const { control } = useFormContext();
   const t = useTranslations('BookForm');
+  const languages = useLanguages();
+  const languagesOptions = useMemo<Option[]>(
+    () => languages.map((v) => ({ label: v, value: v })),
+    [languages]
+  );
   return (
     <Card className="w-full md:w-1/2">
       <CardHeader>
@@ -89,17 +97,22 @@ const LeftSideForm: React.FC = () => {
             control={control}
             placeholder={t('categoryPlaceholder')}
           />
-          <FormSelect
+          <FormMultiSelect
             name="language"
             label={t('language')}
-            options={[
-              { label: 'Author1', value: '1' },
-              { label: 'Author2', value: '2' },
-            ]}
-            isRequired
+            options={languagesOptions}
             control={control}
             placeholder={t('languagePlaceholder')}
+            className="w-full"
+            isMultiSelect={false}
           />
+          {/*<FormSelect*/}
+          {/*  name="language"*/}
+          {/*  label={t('language')}*/}
+          {/*  options={languagesOptions}*/}
+          {/*  control={control}*/}
+          {/*  placeholder={t('languagePlaceholder')}*/}
+          {/*/>*/}
         </div>
         <div className="flex gap-4 items-center">
           <FormInput

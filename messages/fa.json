@@ -71,7 +71,8 @@
     "mustBeInteger": "باید عدد صحیح باشد",
     "mustBePositive": "باید عددی بزرگ‌تر از صفر باشد",
     "invalidDate": "تاریخ وارد شده معتبر نیست",
-    "invalidUuid": "شناسه معتبر نیست"
+    "invalidUuid": "شناسه معتبر نیست",
+    "invalidFile": "فایل معتبر نیست"
   },
   "BookForm": {
     "bookInformation": "اطلاعات کتاب",

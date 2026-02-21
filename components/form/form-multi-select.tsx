@@ -2,28 +2,19 @@ import React from 'react';
 import { FormProps } from '@/components/form/types';
 import { Controller } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import RequiredSign from '@/components/form/required-sign';
 import { useLocale } from 'use-intl';
-
-export type Option = {
-  label: string | ((value: string) => React.ReactNode);
-  value: string;
-};
+import { Option } from '@/components/form/form-select';
+import MultiSelect from '@/components/ui/multi-select';
 
 type Props = FormProps & {
   placeholder?: string;
   options: Option[];
   className?: string;
+  isMultiSelect?: boolean;
 };
 
-const FormSelect: React.FC<Props> = ({
+const FormMultiSelect: React.FC<Props> = ({
   options,
   placeholder,
   label,
@@ -31,6 +22,7 @@ const FormSelect: React.FC<Props> = ({
   control,
   className,
   isRequired,
+  isMultiSelect = true,
 }) => {
   const locale = useLocale();
   const isPersian = locale === 'fa';
@@ -44,23 +36,16 @@ const FormSelect: React.FC<Props> = ({
             {label}
             {isRequired && <RequiredSign />}
           </FieldLabel>
-          <Select
-            dir={isPersian ? 'rtl' : 'ltr'}
-            name={field.name}
+          <MultiSelect
+            hidePlaceholderWhenSelected
+            className={className}
             value={field.value}
-            onValueChange={field.onChange}
-          >
-            <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className={className}>
-              <SelectValue placeholder={placeholder} />
-            </SelectTrigger>
-            <SelectContent position="item-aligned">
-              {options.map(({ label: opLabel, value }) => (
-                <SelectItem value={value} key={value}>
-                  {typeof opLabel === 'function' ? opLabel(value) : opLabel}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onChange={field.onChange}
+            placeholder={placeholder}
+            maxSelected={isMultiSelect ? undefined : 1}
+            inputProps={{ name: field.name, dir: isPersian ? 'rtl' : 'ltr' }}
+            options={options.map(({ label, value }) => ({ value, label: label as string }))}
+          />
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
       )}
@@ -68,4 +53,4 @@ const FormSelect: React.FC<Props> = ({
   );
 };
 
-export default FormSelect;
+export default FormMultiSelect;

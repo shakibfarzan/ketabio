@@ -1,16 +1,14 @@
 import { z } from 'zod';
 
-const bookSchema = (t: (input: string) => string) =>
+export const bookFormSchema = (t: (input: string) => string) =>
   z.object({
     title: z
       .string()
       .min(2, { message: t('minLength') })
       .nonoptional({ message: t('isRequired') }),
-    description: z.string().optional().nullable(),
-    coverImage: z
-      .url({ message: t('invalidUrl') })
-      .optional()
-      .nullable(),
+    description: z.string().nonoptional({ message: t('isRequired') }),
+    coverImage: z.file({ message: t('invalidFile') }).nonoptional({ message: t('isRequired') }),
+    bookFile: z.file({ message: t('invalidFile') }).nonoptional({ message: t('isRequired') }),
     language: z.string().optional().nullable(),
     pageCount: z
       .number({ message: t('mustBeNumber') })
@@ -22,10 +20,7 @@ const bookSchema = (t: (input: string) => string) =>
       .date({ message: t('invalidDate') })
       .optional()
       .nullable(),
-    authorId: z
-      .uuid({ message: t('invalidUuid') })
-      .optional()
-      .nullable(),
+    author: z.uuid({ message: t('invalidUuid') }).nonoptional({ message: t('isRequired') }),
+    category: z.uuid({ message: t('invalidUuid') }).nonoptional({ message: t('isRequired') }),
+    isbn: z.string().optional().nullable(),
   });
-
-export default bookSchema;

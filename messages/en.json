@@ -71,7 +71,8 @@
     "mustBeInteger": "Must be an integer",
     "mustBePositive": "Must be a positive number",
     "invalidDate": "Invalid date",
-    "invalidUuid": "Invalid identifier"
+    "invalidUuid": "Invalid identifier",
+    "invalidFile": "Invalid file"
   },
   "BookForm": {
     "bookInformation": "Book Information",

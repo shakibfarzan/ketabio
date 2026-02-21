@@ -4,6 +4,7 @@ import { FormProps } from '@/components/form/types';
 import { Accept } from 'react-dropzone';
 import React from 'react';
 import FileUploader from '@/components/file-uploader';
+import RequiredSign from '@/components/form/required-sign';
 
 type Props = FormProps & {
   accept?: Accept;
@@ -20,6 +21,7 @@ const FormFileUploader: React.FC<Props> = ({
   maxSizeMB,
   maxFiles,
   labelClassName = '',
+  isRequired,
 }) => {
   return (
     <Controller
@@ -28,7 +30,10 @@ const FormFileUploader: React.FC<Props> = ({
       defaultValue={[]}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
-          <FieldLabel className={labelClassName}>{label}</FieldLabel>
+          <FieldLabel className={labelClassName}>
+            {label}
+            {isRequired && <RequiredSign />}
+          </FieldLabel>
 
           <FileUploader
             value={field.value || []}
