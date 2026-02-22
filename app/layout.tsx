@@ -22,6 +22,7 @@ const vazirMatn = Vazirmatn({ subsets: ['arabic'], variable: '--font-fa' });
 export const metadata: Metadata = {
   title: 'Ketabio',
   description: 'Your Smart Digital Library',
+  manifest: '/manifest.webmanifest',
 };
 
 export default async function RootLayout({
