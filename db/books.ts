@@ -1,4 +1,4 @@
-import { books } from '@/db/schema';
+import { books, bookFiles, bookCategories } from '@/db/schema';
 import { db } from '@/db/index';
 import slugify from '@/utils/slugify';
 import { eq } from 'drizzle-orm';
@@ -6,8 +6,14 @@ import { eq } from 'drizzle-orm';
 export type Book = typeof books.$inferSelect;
 
 type BookInsert = typeof books.$inferInsert;
+type BookFileInsert = typeof bookFiles.$inferInsert;
 
-export const createBook = async (args: Omit<BookInsert, 'slug'>) => {
+type CreateBookInput = Omit<BookInsert, 'slug'> & {
+  bookFiles: Omit<BookFileInsert, 'bookId'>[];
+  categoriesIds: string[];
+};
+
+export const createBook = async (args: CreateBookInput) => {
   let slug = slugify(args.title);
   let counter = 1;
 
@@ -23,5 +29,14 @@ export const createBook = async (args: Omit<BookInsert, 'slug'>) => {
     .insert(books)
     .values({ ...args, slug } as BookInsert)
     .returning();
+
+  await db
+    .insert(bookCategories)
+    .values(args.categoriesIds.map((categoryId) => ({ bookId: created.id, categoryId })));
+
+  await db
+    .insert(bookFiles)
+    .values(args.bookFiles.map((bookFile) => ({ bookId: created.id, ...bookFile })));
+
   return created;
 };

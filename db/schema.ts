@@ -71,7 +71,7 @@ export const bookFiles = pgTable(
   'book_files',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    bookId: integer('book_id')
+    bookId: uuid('book_id')
       .notNull()
       .references(() => books.id, { onDelete: 'cascade' }),
     format: bookFormatEnum('format').notNull(),
