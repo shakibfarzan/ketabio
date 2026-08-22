@@ -26,27 +26,40 @@ const langs: Lang[] = [
 const SwitchLocale: React.FC = () => {
   const t = useTranslations('General');
   const locale = useLocale();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleClick = (lang: string) => {
     setCookie('locale', lang);
     window.location.reload();
   };
+
+  const trigger = (
+    <Button variant="ghost" size="icon">
+      {langs.map(({ lang, flagSrc }) => (
+        <Image
+          key={lang}
+          className={locale !== lang ? 'hidden' : 'rounded'}
+          src={flagSrc}
+          alt={lang}
+          width={25}
+          height={25}
+        />
+      ))}
+      <span className="sr-only">{t('switchLanguage')}</span>
+    </Button>
+  );
+
+  if (!mounted) {
+    return trigger;
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          {langs.map(({ lang, flagSrc }) => (
-            <Image
-              key={lang}
-              className={locale !== lang ? 'hidden' : 'rounded'}
-              src={flagSrc}
-              alt={lang}
-              width={25}
-              height={25}
-            />
-          ))}
-          <span className="sr-only">{t('switchLanguage')}</span>
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {langs.map(({ title, lang }) => (
           <DropdownMenuItem key={lang} onClick={() => handleClick(lang)}>
