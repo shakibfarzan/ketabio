@@ -11,21 +11,25 @@ import FormFileUploader from '@/components/form/form-file-uploader';
 import { Button } from '@/components/ui/button';
 import useLanguages from '@/hooks/useLanguages';
 import FormMultiSelect from '@/components/form/form-multi-select';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { bookFormSchema } from '@/lib/validators/book.schema';
 
 const BookForm: React.FC = () => {
-  const methods = useForm<FieldValues>({
+  const t = useTranslations('Forms');
+  const methods = useForm({
     defaultValues: {
       title: '',
       author: '',
       description: '',
       category: '',
-      language: '',
+      language: [],
       isbn: '',
-      publishedAt: '',
-      pageCount: '',
-      bookFile: null,
-      coverImage: null,
+      publishedAt: null,
+      pageCount: null,
+      bookFile: undefined,
+      coverImage: undefined,
     },
+    resolver: zodResolver(bookFormSchema(t)),
   });
 
   const { handleSubmit } = methods;
@@ -85,7 +89,7 @@ const LeftSideForm: React.FC = () => {
           control={control}
           isRequired
         />
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col md:flex-row gap-4 w-full items-center">
           <FormSelect
             name="category"
             label={t('category')}
@@ -96,6 +100,7 @@ const LeftSideForm: React.FC = () => {
             isRequired
             control={control}
             placeholder={t('categoryPlaceholder')}
+            className="md:w-1/2 w-full"
           />
           <FormMultiSelect
             name="language"
@@ -106,26 +111,21 @@ const LeftSideForm: React.FC = () => {
             className="w-full"
             isMultiSelect={false}
           />
-          {/*<FormSelect*/}
-          {/*  name="language"*/}
-          {/*  label={t('language')}*/}
-          {/*  options={languagesOptions}*/}
-          {/*  control={control}*/}
-          {/*  placeholder={t('languagePlaceholder')}*/}
-          {/*/>*/}
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex flex-col md:flex-row gap-4 w-full items-center">
           <FormInput
             name="isbn"
             label="ISBN"
             control={control}
             placeholder={t('isbnPlaceholder')}
+            className="md:w-1/2 w-full"
           />
           <FormDatePicker
             name="publishedAt"
             label={t('publishedAt')}
             control={control}
             placeholder={t('publishedAtPlaceholder')}
+            className="md:w-1/2 w-full"
           />
         </div>
         <div className="flex gap-4 items-center">
@@ -136,9 +136,9 @@ const LeftSideForm: React.FC = () => {
             placeholder={t('pageCountPlaceholder')}
             min={1}
             type="number"
-            className="w-1/2"
+            className="md:w-1/2 w-full"
           />
-          <div className="w-1/2" />
+          <div className="w-1/2 hidden md:block" />
         </div>
       </CardContent>
     </Card>

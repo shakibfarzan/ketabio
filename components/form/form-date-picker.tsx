@@ -13,9 +13,10 @@ import { useLocale } from 'use-intl';
 
 type Props = FormProps & {
   placeholder?: string;
+  className?: string;
 };
 
-const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder }) => {
+const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder, className }) => {
   const locale = useLocale();
   const isPersian = locale === 'fa';
   return (
@@ -23,7 +24,7 @@ const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder }) 
       name={name}
       control={control}
       render={({ field, fieldState }) => (
-        <Field data-invalid={fieldState.invalid}>
+        <Field className={className} data-invalid={fieldState.invalid}>
           <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
           <Popover>
             <PopoverTrigger asChild>
@@ -31,7 +32,7 @@ const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder }) 
                 variant="outline"
                 id={field.name}
                 aria-invalid={fieldState.invalid}
-                className="w-full justify-start text-left font-normal bg-transparent"
+                className="w-full justify-start text-left overflow-hidden font-normal bg-transparent"
               >
                 {field.value ? (
                   format(field.value, 'PPP')
