@@ -1,0 +1,7 @@
+{
+    "prettier.configPath": ".prettierrc",
+    "prettier.bracketSpacing": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.prettier": "always"
+    }
+}

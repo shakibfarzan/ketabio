@@ -9,8 +9,6 @@ import ThemeProvider from '@/providers/theme-provider';
 import Footer from '@/components/footer';
 import { ClerkProvider } from '@clerk/nextjs';
 import { enUS, faIR } from '@clerk/localizations';
-import { getOrCreateUser } from '@/utils/auth';
-import { ROLES } from '@/db/schema';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
