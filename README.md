@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Ketabio
 
-## Getting Started
+Ketabio is a bilingual digital-library web application built with Next.js. It combines a
+public landing experience with authenticated member features and an admin area for managing
+books.
 
-First, run the development server:
+The project currently includes Clerk authentication, English/Persian localization, RTL and
+dark-mode support, a PostgreSQL domain model through Drizzle ORM, Pinata file-storage helpers,
+PWA configuration, and an in-progress admin book workflow.
+
+## Quick start
+
+Requirements: Node.js 20.9 or newer, npm, a PostgreSQL/Neon database, and a Clerk application.
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open <http://localhost:3000>.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The application expects these environment variables:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```dotenv
+DATABASE_URL=
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
+CLERK_WEBHOOK_SECRET=
+PINATA_JWT=
+NEXT_PUBLIC_GATEWAY_URL=
+```
 
-## Learn More
+Never commit real credentials. See the detailed guide for service setup, database migrations,
+architecture, current limitations, and troubleshooting.
 
-To learn more about Next.js, take a look at the following resources:
+## Documentation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Project onboarding and interview guide](docs/ONBOARDING_AND_INTERVIEW_GUIDE.md)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Commands
 
-## Deploy on Vercel
+| Command           | Purpose                                     |
+| ----------------- | ------------------------------------------- |
+| `npm run dev`     | Start the development server                |
+| `npm run build`   | Create and type-check a production build    |
+| `npm run start`   | Run the production build                    |
+| `npm run lint`    | Run ESLint                                  |
+| `npm run format`  | Format the repository with Prettier         |
+| `npm run migrate` | Generate and apply Drizzle database changes |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Current status
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ketabio is under active development. The landing page, authentication, localization, theme,
+database schema, and admin book form UI are present. Book submission, catalog rendering, edit
+flows, and several member-library features are not complete yet.
