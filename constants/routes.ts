@@ -8,6 +8,8 @@ const routes = {
     BOOKS: '/admin/books',
     ADD_BOOK: '/admin/books/add',
     EDIT_BOOK: (slug: string) => `/admin/books/edit/${slug}`,
+    CATEGORIES: '/admin/categories',
+    AUTHORS: '/admin/authors',
   },
 } as const;
 

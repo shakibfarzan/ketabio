@@ -25,7 +25,8 @@
     "change": "Change",
     "dropFiles": "Drop files here",
     "save": "Save",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "authors": "Authors"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
