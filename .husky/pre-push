@@ -1,5 +1,2 @@
-npm run format
-git add .
-git commit -m "chore: format files"
 npm run lint
 npm run build
