@@ -26,7 +26,11 @@
     "dropFiles": "Drop files here",
     "save": "Save",
     "cancel": "Cancel",
-    "authors": "Authors"
+    "authors": "Authors",
+    "authorsManagement": "Authors Management",
+    "addAuthor": "Add Author",
+    "categoriesManagement": "Categories Management",
+    "addCategory": "Add Category"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
