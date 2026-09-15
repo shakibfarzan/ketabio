@@ -3,14 +3,18 @@
 import AdminTopSection from '@/app/admin/_components/admin-top-section';
 import { useTranslations } from 'next-intl';
 
-const AdminCategoriesTopSection = () => {
+type Props = {
+  onAddClicked: () => void;
+};
+
+const AdminCategoriesTopSection = ({ onAddClicked }: Props) => {
   const t = useTranslations('General');
 
   return (
     <AdminTopSection
       title={t('categoriesManagement')}
       buttonTitle={t('addCategory')}
-      onAddClicked={() => {}}
+      onAddClicked={onAddClicked}
     />
   );
 };

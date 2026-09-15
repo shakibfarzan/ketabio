@@ -1,13 +1,10 @@
-import Container from '@/components/container';
-import AdminCategoriesTopSection from './_components/admin-categories-top-section';
+import { getCategories } from '@/db/categories';
+import CategoriesManager from './_components/categories-manager';
 
-const CategoriesPage = () => {
-  return (
-    <>
-      <AdminCategoriesTopSection />
-      <Container>Categories</Container>
-    </>
-  );
+const CategoriesPage = async () => {
+  const categories = await getCategories();
+
+  return <CategoriesManager categories={categories} />;
 };
 
 export default CategoriesPage;

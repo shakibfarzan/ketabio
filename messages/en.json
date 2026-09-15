@@ -30,7 +30,14 @@
     "authorsManagement": "Authors Management",
     "addAuthor": "Add Author",
     "categoriesManagement": "Categories Management",
-    "addCategory": "Add Category"
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "categoryName": "Category name",
+    "categoryNamePlaceholder": "Enter category name",
+    "noCategories": "No categories yet.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteCategoryConfirmation": "Delete this category? It will be removed from all books."
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
