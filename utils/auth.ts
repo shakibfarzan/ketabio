@@ -1,7 +1,8 @@
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { db } from '@/db';
 import { eq } from 'drizzle-orm';
-import { users } from '@/db/schema';
+import { ROLES, users } from '@/db/schema';
+import { ForbiddenError, UnauthorizedError } from '@/lib/errors/app-error';
 import { User } from '@/db/users';
 
 export const getOrCreateUser = async () => {
@@ -46,4 +47,15 @@ export const getOrCreateUser = async () => {
     .returning();
 
   return created;
+};
+
+/**
+ * Ensures the current request belongs to a signed-in admin.
+ * Throws `UnauthorizedError` / `ForbiddenError` (translated later by the UI via error codes).
+ */
+export const requireAdmin = async () => {
+  const user = await getOrCreateUser();
+  if (!user) throw new UnauthorizedError();
+  if (user.role !== ROLES.ADMIN) throw new ForbiddenError();
+  return user;
 };

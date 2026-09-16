@@ -37,7 +37,8 @@
     "noCategories": "No categories yet.",
     "edit": "Edit",
     "delete": "Delete",
-    "deleteCategoryConfirmation": "Delete this category? It will be removed from all books."
+    "deleteCategoryConfirmation": "Delete this category? It will be removed from all books.",
+    "bookCreated": "Book created successfully"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
@@ -106,5 +107,31 @@
     "isbnPlaceholder": "Enter ISBN",
     "coverImage": "Cover Image",
     "bookFile": "Book File"
+  },
+  "errors": {
+    "INTERNAL_ERROR": "Something went wrong. Please try again.",
+    "UNAUTHORIZED": "You need to sign in.",
+    "FORBIDDEN": "You do not have permission to perform this action.",
+    "VALIDATION_ERROR": "Please check the entered information.",
+    "NOT_FOUND": "The requested resource was not found.",
+    "CONFLICT": "This operation conflicts with existing data.",
+    "BOOK_NOT_FOUND": "Book not found.",
+    "BOOK_SLUG_EXISTS": "A book with this slug already exists.",
+    "BOOK_IN_USE": "This book cannot be deleted because it is still in use.",
+    "BOOK_CREATE_FAILED": "Failed to create the book.",
+    "BOOK_UPDATE_FAILED": "Failed to update the book.",
+    "BOOK_DELETE_FAILED": "Failed to delete the book.",
+    "BOOK_FETCH_FAILED": "Failed to load books.",
+    "REQUIRED": "This field is required",
+    "TOO_SHORT": "This value is too short",
+    "TOO_LONG": "This value is too long",
+    "INVALID": "This value is not valid",
+    "INVALID_SLUG": "Slug may only contain lowercase letters, numbers and hyphens",
+    "INVALID_UUID": "Invalid identifier",
+    "INVALID_URL": "Invalid URL",
+    "INVALID_NUMBER": "Must be a number",
+    "INVALID_DATE": "Invalid date",
+    "MUST_BE_INTEGER": "Must be an integer",
+    "MUST_BE_POSITIVE": "Must be a positive number"
   }
 }
