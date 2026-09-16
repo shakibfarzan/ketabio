@@ -1,22 +1,29 @@
 'use client';
-import * as React from 'react';
-import { Controller } from 'react-hook-form';
 import { format } from 'date-fns';
 import { faIR } from 'react-day-picker/locale';
+import { Controller, FieldValues } from 'react-hook-form';
 
+import { FormProps } from '@/components/form/types';
+import RequiredSign from '@/components/form/required-sign';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { FormProps } from '@/components/form/types';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useLocale } from 'use-intl';
 
-type Props = FormProps & {
+type Props<T extends FieldValues> = FormProps<T> & {
   placeholder?: string;
   className?: string;
 };
 
-const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder, className }) => {
+function FormDatePicker<T extends FieldValues>({
+  name,
+  label,
+  control,
+  placeholder,
+  className,
+  isRequired,
+}: Props<T>) {
   const locale = useLocale();
   const isPersian = locale === 'fa';
   return (
@@ -25,7 +32,10 @@ const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder, cl
       control={control}
       render={({ field, fieldState }) => (
         <Field className={className} data-invalid={fieldState.invalid}>
-          <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
+          <FieldLabel htmlFor={field.name}>
+            {label}
+            {isRequired && <RequiredSign />}
+          </FieldLabel>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -58,6 +68,6 @@ const FormDatePicker: React.FC<Props> = ({ name, label, control, placeholder, cl
       )}
     />
   );
-};
+}
 
 export default FormDatePicker;

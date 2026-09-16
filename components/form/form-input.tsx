@@ -1,11 +1,11 @@
 import React from 'react';
-import { Controller } from 'react-hook-form';
+import { Controller, FieldValues } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { FormProps } from '@/components/form/types';
 import RequiredSign from '@/components/form/required-sign';
 
-type Props = FormProps & {
+type Props<T extends FieldValues> = FormProps<T> & {
   type?: React.HTMLInputTypeAttribute;
   min?: number;
   max?: number;
@@ -14,7 +14,7 @@ type Props = FormProps & {
   className?: string;
 };
 
-const FormInput: React.FC<Props> = ({
+function FormInput<T extends FieldValues>({
   name,
   label,
   type,
@@ -25,7 +25,7 @@ const FormInput: React.FC<Props> = ({
   placeholder,
   isRequired,
   className = '',
-}) => {
+}: Props<T>) {
   const isNumber = type === 'number';
   return (
     <Controller

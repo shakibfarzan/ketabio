@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormProps } from '@/components/form/types';
-import { Controller } from 'react-hook-form';
+import { Controller, FieldValues } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import {
   Select,
@@ -17,13 +17,13 @@ export type Option = {
   value: string;
 };
 
-type Props = FormProps & {
+type Props<T extends FieldValues> = FormProps<T> & {
   placeholder?: string;
   options: Option[];
   className?: string;
 };
 
-const FormSelect: React.FC<Props> = ({
+function FormSelect<T extends FieldValues>({
   options,
   placeholder,
   label,
@@ -31,7 +31,7 @@ const FormSelect: React.FC<Props> = ({
   control,
   className,
   isRequired,
-}) => {
+}: Props<T>) {
   const locale = useLocale();
   const isPersian = locale === 'fa';
   return (
@@ -39,7 +39,7 @@ const FormSelect: React.FC<Props> = ({
       name={name}
       control={control}
       render={({ field, fieldState }) => (
-        <Field orientation="vertical" data-invalid={fieldState.invalid}>
+        <Field className={className} orientation="vertical" data-invalid={fieldState.invalid}>
           <FieldLabel htmlFor={field.name}>
             {label}
             {isRequired && <RequiredSign />}
@@ -47,10 +47,10 @@ const FormSelect: React.FC<Props> = ({
           <Select
             dir={isPersian ? 'rtl' : 'ltr'}
             name={field.name}
-            value={field.value}
+            value={field.value ?? ''}
             onValueChange={field.onChange}
           >
-            <SelectTrigger id={field.name} aria-invalid={fieldState.invalid} className={className}>
+            <SelectTrigger id={field.name} aria-invalid={fieldState.invalid}>
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent position="item-aligned">
@@ -66,6 +66,6 @@ const FormSelect: React.FC<Props> = ({
       )}
     />
   );
-};
+}
 
 export default FormSelect;
