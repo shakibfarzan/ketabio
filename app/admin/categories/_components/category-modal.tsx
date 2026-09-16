@@ -14,9 +14,9 @@ import {
 import type { Category } from '@/db/categories';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
-import { useEffect, useMemo, useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { categorySchema } from '../form-schemas';
 
 type CategoryFormValues = {
   name: string;
@@ -33,16 +33,9 @@ const CategoryModal = ({ category, open, onOpenChange, onSaved }: Props) => {
   const t = useTranslations('General');
   const tForms = useTranslations('Forms');
   const [isPending, startTransition] = useTransition();
-  const schema = useMemo(
-    () =>
-      z.object({
-        name: z.string().trim().min(2, tForms('minLength')).max(100, tForms('maxLength100')),
-      }),
-    [tForms]
-  );
   const { control, handleSubmit, reset, setError } = useForm({
     defaultValues: { name: '' },
-    resolver: zodResolver(schema),
+    resolver: zodResolver(categorySchema(tForms)),
   });
 
   useEffect(() => {

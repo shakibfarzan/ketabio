@@ -62,6 +62,6 @@ function FormInput<T extends FieldValues>({
       name={name}
     />
   );
-};
+}
 
 export default FormInput;
