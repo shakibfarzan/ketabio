@@ -84,7 +84,8 @@
     "mustBePositive": "Must be a positive number",
     "invalidDate": "Invalid date",
     "invalidUuid": "Invalid identifier",
-    "invalidFile": "Invalid file"
+    "invalidFile": "Invalid file",
+    "maxLength100": "Must be at most 100 characters"
   },
   "BookForm": {
     "bookInformation": "Book Information",

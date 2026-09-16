@@ -84,7 +84,8 @@
     "mustBePositive": "باید عددی بزرگ‌تر از صفر باشد",
     "invalidDate": "تاریخ وارد شده معتبر نیست",
     "invalidUuid": "شناسه معتبر نیست",
-    "invalidFile": "فایل معتبر نیست"
+    "invalidFile": "فایل معتبر نیست",
+    "maxLength100": "حداکثر باید ۱۰۰ کاراکتر باشد"
   },
   "BookForm": {
     "bookInformation": "اطلاعات کتاب",
