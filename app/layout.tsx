@@ -1,14 +1,15 @@
-import type { Metadata } from 'next';
-import { Poppins, Vazirmatn } from 'next/font/google';
-import './globals.css';
-import React from 'react';
-import { NextIntlClientProvider } from 'next-intl';
-import { cookies } from 'next/headers';
-import Navbar from '@/components/navbar';
-import ThemeProvider from '@/providers/theme-provider';
 import Footer from '@/components/footer';
-import { ClerkProvider } from '@clerk/nextjs';
+import Navbar from '@/components/navbar';
+import { Toaster } from '@/components/ui/sonner';
+import ThemeProvider from '@/providers/theme-provider';
 import { enUS, faIR } from '@clerk/localizations';
+import { ClerkProvider } from '@clerk/nextjs';
+import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { Poppins, Vazirmatn } from 'next/font/google';
+import { cookies } from 'next/headers';
+import React from 'react';
+import './globals.css';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -46,6 +47,7 @@ export default async function RootLayout({
               <Navbar />
               {children}
               <Footer />
+              <Toaster />
             </ThemeProvider>
           </NextIntlClientProvider>
         </body>
