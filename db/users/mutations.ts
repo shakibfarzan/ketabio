@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '..';
 import { users } from '../schema';
-import { User } from '../users';
+import { User } from './types';
 
 type SyncUserData = {
   email: string;

@@ -24,6 +24,10 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
 };
 
+// The document shell is personalized from the request's locale cookie.
+// It must be rendered at request time, rather than prerendered as a shared shell.
+export const instant = false;
+
 export default async function RootLayout({
   children,
 }: Readonly<{

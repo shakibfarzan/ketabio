@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { User as ClerkUser } from '@clerk/backend';
-import { User } from '@/db/users';
+import { User } from '@/db/users/types';
 
 type EventType = {
   type: string;

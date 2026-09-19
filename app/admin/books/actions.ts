@@ -1,7 +1,5 @@
 'use server';
 
-import * as booksRepository from '@/db/books';
-import type { Book } from '@/db/books';
 import { getValidationErrors } from '@/lib/errors/validation';
 import { handleActionError } from '@/lib/errors/error-handler';
 import {
@@ -15,6 +13,9 @@ import { uploadFile } from '@/utils/config-files';
 import routes from '@/constants/routes';
 import { revalidatePath } from 'next/cache';
 import requireAdmin from '@/lib/auth/require-admin';
+import { Book } from '@/db/books/types';
+import { createBook, deleteBook, updateBook } from '@/db/books/mutations';
+import { getBookBySlug, listBooks } from '@/db/books/queries';
 
 /**
  * Books Server Actions.
@@ -102,7 +103,7 @@ export const createBookAction = async (formData: FormData): Promise<ActionResult
       uploadFile(raw.bookFile),
     ]);
 
-    const book = await booksRepository.createBook({
+    const book = await createBook({
       ...metadata.data,
       coverImage: coverImageUrl,
       bookFiles: [{ format: 'pdf', fileUrl: bookFileUrl, fileSize: raw.bookFile.size }],
@@ -127,7 +128,7 @@ export const updateBookAction = async (id: string, input: unknown): Promise<Acti
       return fail('VALIDATION_ERROR', getValidationErrors(validated.error));
     }
 
-    const book = await booksRepository.updateBook(parsedId.data, validated.data);
+    const book = await updateBook(parsedId.data, validated.data);
 
     revalidateBooks();
     revalidatePath(routes.ADMIN.EDIT_BOOK(book.slug));
@@ -144,7 +145,7 @@ export const deleteBookAction = async (id: string): Promise<ActionResult<{ id: s
     const parsedId = bookIdSchema.safeParse(id);
     if (!parsedId.success) return fail('BOOK_NOT_FOUND');
 
-    const deleted = await booksRepository.deleteBook(parsedId.data);
+    const deleted = await deleteBook(parsedId.data);
 
     revalidateBooks();
     return ok({ id: deleted.id });
@@ -158,7 +159,7 @@ export const getBookAction = async (slug: string): Promise<ActionResult<Book>> =
     const parsedSlug = bookSlugSchema.safeParse(slug);
     if (!parsedSlug.success) return fail('BOOK_NOT_FOUND');
 
-    return ok(await booksRepository.getBookBySlug(parsedSlug.data));
+    return ok(await getBookBySlug(parsedSlug.data));
   } catch (error) {
     return handleActionError(error, { operation: 'getBook' });
   }
@@ -166,7 +167,7 @@ export const getBookAction = async (slug: string): Promise<ActionResult<Book>> =
 
 export const listBooksAction = async (): Promise<ActionResult<Book[]>> => {
   try {
-    return ok(await booksRepository.listBooks());
+    return ok(await listBooks());
   } catch (error) {
     return handleActionError(error, { operation: 'listBooks' });
   }

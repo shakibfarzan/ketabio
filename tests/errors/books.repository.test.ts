@@ -4,15 +4,15 @@
  *
  * Run: npm test  (uses --experimental-test-module-mocks to swap the Neon client for PGlite)
  */
-import assert from 'node:assert/strict';
-import path from 'node:path';
-import { after, before, describe, it, mock } from 'node:test';
-import { PGlite } from '@electric-sql/pglite';
-import { drizzle } from 'drizzle-orm/pglite';
-import { generateDrizzleJson, generateMigration } from 'drizzle-kit/api';
 import * as schema from '@/db/schema';
 import { AppError } from '@/lib/errors/app-error';
 import { handleActionError } from '@/lib/errors/error-handler';
+import { PGlite } from '@electric-sql/pglite';
+import { generateDrizzleJson, generateMigration } from 'drizzle-kit/api';
+import { drizzle } from 'drizzle-orm/pglite';
+import assert from 'node:assert/strict';
+import path from 'node:path';
+import { after, before, describe, it, mock } from 'node:test';
 
 const client = new PGlite();
 const testDb = drizzle({ client, schema });
@@ -20,7 +20,8 @@ const testDb = drizzle({ client, schema });
 // Replace `@/db` (Neon) with the PGlite instance BEFORE the repository is loaded.
 mock.module(path.resolve('db/index.ts'), { namedExports: { db: testDb } });
 
-let books: typeof import('@/db/books');
+let booksMutations: typeof import('@/db/books/mutations');
+let booksQueries: typeof import('@/db/books/queries');
 
 let authorId: string;
 let categoryId: string;
@@ -47,7 +48,8 @@ const expectAppError = async (promise: Promise<unknown>, code: string) => {
 
 describe('books repository (PGlite)', () => {
   before(async () => {
-    books = await import('@/db/books');
+    booksMutations = await import('@/db/books/mutations');
+    booksQueries = await import('@/db/books/queries');
     // Build the schema straight from db/schema.ts (the project deploys with `drizzle-kit push`,
     // and the checked-in SQL migrations lag behind the schema file).
     const statements = await generateMigration(
@@ -70,17 +72,17 @@ describe('books repository (PGlite)', () => {
   });
 
   it('creates a book and generates a slug', async () => {
-    const book = await books.createBook(validInput());
+    const book = await booksMutations.createBook(validInput());
     assert.equal(book.slug, 'clean-code');
-    assert.equal((await books.listBooks()).length, 1);
+    assert.equal((await booksQueries.listBooks()).length, 1);
   });
 
   it('auto-suffixes generated slugs, but rejects an explicit duplicate slug', async () => {
-    const second = await books.createBook(validInput());
+    const second = await booksMutations.createBook(validInput());
     assert.equal(second.slug, 'clean-code-2');
 
     const error = await expectAppError(
-      books.createBook({ ...validInput(), slug: 'clean-code' }),
+      booksMutations.createBook({ ...validInput(), slug: 'clean-code' }),
       'BOOK_SLUG_EXISTS'
     );
     assert.deepEqual(error.fields, { slug: 'BOOK_SLUG_EXISTS' });
@@ -95,7 +97,10 @@ describe('books repository (PGlite)', () => {
 
   it('maps a foreign-key violation on author to a field error', async () => {
     const error = await expectAppError(
-      books.createBook({ ...validInput(), authorId: '00000000-0000-4000-8000-000000000000' }),
+      booksMutations.createBook({
+        ...validInput(),
+        authorId: '00000000-0000-4000-8000-000000000000',
+      }),
       'VALIDATION_ERROR'
     );
     assert.deepEqual(error.fields, { authorId: 'INVALID' });
@@ -103,43 +108,46 @@ describe('books repository (PGlite)', () => {
 
   it('get / update / delete a non-existing book -> BOOK_NOT_FOUND', async () => {
     const missing = '00000000-0000-4000-8000-000000000001';
-    await expectAppError(books.getBookById(missing), 'BOOK_NOT_FOUND');
-    await expectAppError(books.getBookBySlug('nope'), 'BOOK_NOT_FOUND');
-    await expectAppError(books.updateBook(missing, { title: 'x' }), 'BOOK_NOT_FOUND');
-    await expectAppError(books.deleteBook(missing), 'BOOK_NOT_FOUND');
+    await expectAppError(booksQueries.getBookById(missing), 'BOOK_NOT_FOUND');
+    await expectAppError(booksQueries.getBookBySlug('nope'), 'BOOK_NOT_FOUND');
+    await expectAppError(booksMutations.updateBook(missing, { title: 'x' }), 'BOOK_NOT_FOUND');
+    await expectAppError(booksMutations.deleteBook(missing), 'BOOK_NOT_FOUND');
   });
 
   it('update to a duplicate slug -> BOOK_SLUG_EXISTS with field info', async () => {
-    const book = await books.getBookBySlug('clean-code-2');
+    const book = await booksQueries.getBookBySlug('clean-code-2');
     const error = await expectAppError(
-      books.updateBook(book.id, { slug: 'clean-code' }),
+      booksMutations.updateBook(book.id, { slug: 'clean-code' }),
       'BOOK_SLUG_EXISTS'
     );
     assert.deepEqual(error.fields, { slug: 'BOOK_SLUG_EXISTS' });
 
-    const updated = await books.updateBook(book.id, { title: 'Clean Code 2nd' });
+    const updated = await booksMutations.updateBook(book.id, { title: 'Clean Code 2nd' });
     assert.equal(updated.title, 'Clean Code 2nd');
   });
 
   it('delete a book referenced elsewhere -> BOOK_IN_USE (foreign key)', async () => {
-    const book = await books.getBookBySlug('clean-code-2');
+    const book = await booksQueries.getBookBySlug('clean-code-2');
     const [user] = await testDb
       .insert(schema.users)
       .values({ id: 'user_1', email: 'a@b.c', firstName: 'A', lastName: 'B' })
       .returning();
     await testDb.insert(schema.favorites).values({ userId: user.id, bookId: book.id });
 
-    await expectAppError(books.deleteBook(book.id), 'BOOK_IN_USE');
+    await expectAppError(booksMutations.deleteBook(book.id), 'BOOK_IN_USE');
 
     await testDb.delete(schema.favorites);
-    const deleted = await books.deleteBook(book.id);
+    const deleted = await booksMutations.deleteBook(book.id);
     assert.equal(deleted.id, book.id);
-    await expectAppError(books.getBookById(book.id), 'BOOK_NOT_FOUND');
+    await expectAppError(booksQueries.getBookById(book.id), 'BOOK_NOT_FOUND');
   });
 
   it('unexpected database failure -> domain *_FAILED code, raw error hidden from client', async () => {
     await client.exec('DROP TABLE book_files CASCADE');
-    const error = await expectAppError(books.createBook(validInput()), 'BOOK_CREATE_FAILED');
+    const error = await expectAppError(
+      booksMutations.createBook(validInput()),
+      'BOOK_CREATE_FAILED'
+    );
     assert.match(String((error.cause as Error)?.message), /Failed query|does not exist/);
 
     const log = mock.method(console, 'error', () => {});
