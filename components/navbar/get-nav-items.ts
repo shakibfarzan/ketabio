@@ -1,6 +1,6 @@
 import routes from '@/constants/routes';
 import { ROLES } from '@/db/schema';
-import { getOrCreateUser } from '@/utils/auth';
+import getOrCreateUser from '@/lib/auth/get-or-create-user';
 import compact from '@/utils/compact';
 import { getTranslations } from 'next-intl/server';
 

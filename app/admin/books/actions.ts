@@ -11,10 +11,10 @@ import {
   updateBookSchema,
 } from '@/lib/validators/book.schema';
 import { fail, ok, type ActionResult } from '@/types/action-result';
-import { requireAdmin } from '@/utils/auth';
 import { uploadFile } from '@/utils/config-files';
 import routes from '@/constants/routes';
 import { revalidatePath } from 'next/cache';
+import requireAdmin from '@/lib/auth/require-admin';
 
 /**
  * Books Server Actions.

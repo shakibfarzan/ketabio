@@ -1,4 +1,4 @@
-import { getOrCreateUser } from '@/utils/auth';
+import getOrCreateUser from '@/lib/auth/get-or-create-user';
 import React, { PropsWithChildren, useContext } from 'react';
 
 type UserContextType = Awaited<ReturnType<typeof getOrCreateUser>>;
