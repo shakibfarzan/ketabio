@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import FormInput from '@/components/form/form-input';
-import { FormProvider, useForm, useFormContext } from 'react-hook-form';
+import { FormProvider, useForm, useFormContext, type Resolver } from 'react-hook-form';
 import FormSelect, { Option } from '@/components/form/form-select';
 import FormTextarea from '@/components/form/form-textarea';
 import FormDatePicker from '@/components/form/form-date-picker';
@@ -12,16 +12,54 @@ import { Button } from '@/components/ui/button';
 import useLanguages from '@/hooks/useLanguages';
 import FormMultiSelect from '@/components/form/form-multi-select';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { bookFormSchema } from '@/lib/validators/book.schema';
+import { bookFormSchema, type BookFormValues } from '@/lib/validators/book.schema';
+import { createBookAction } from '@/app/admin/books/actions';
+import useErrorMessage from '@/hooks/useErrorMessage';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import routes from '@/constants/routes';
+import { useTransition } from 'react';
+
+const FORM_FIELDS: ReadonlySet<string> = new Set([
+  'title',
+  'description',
+  'coverImage',
+  'bookFile',
+  'language',
+  'pageCount',
+  'publishedAt',
+  'authorId',
+  'categoryId',
+  'isbn',
+]);
+
+const toFormData = (values: BookFormValues) => {
+  const formData = new FormData();
+  formData.set('title', values.title);
+  formData.set('description', values.description);
+  formData.set('authorId', values.authorId);
+  formData.set('categoryId', values.categoryId);
+  formData.set('coverImage', values.coverImage);
+  formData.set('bookFile', values.bookFile);
+  if (values.language?.[0]) formData.set('language', values.language[0]);
+  if (values.isbn) formData.set('isbn', values.isbn);
+  if (values.pageCount != null) formData.set('pageCount', String(values.pageCount));
+  if (values.publishedAt) formData.set('publishedAt', values.publishedAt.toISOString());
+  return formData;
+};
 
 const BookForm: React.FC = () => {
   const t = useTranslations('Forms');
-  const methods = useForm({
+  const tGeneral = useTranslations('General');
+  const { describe } = useErrorMessage();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const methods = useForm<BookFormValues, unknown, BookFormValues>({
     defaultValues: {
       title: '',
-      author: '',
+      authorId: '',
       description: '',
-      category: '',
+      categoryId: '',
       language: [],
       isbn: '',
       publishedAt: null,
@@ -29,21 +67,46 @@ const BookForm: React.FC = () => {
       bookFile: undefined,
       coverImage: undefined,
     },
-    resolver: zodResolver(bookFormSchema(t)),
+    // publishedAt is coerced, so the schema's input type is wider than its output type.
+    resolver: zodResolver(bookFormSchema(t)) as unknown as Resolver<
+      BookFormValues,
+      unknown,
+      BookFormValues
+    >,
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, setError } = methods;
+
+  const submit = (values: BookFormValues) => {
+    startTransition(async () => {
+      const result = await createBookAction(toFormData(values));
+
+      if (!result.success) {
+        // Server only sends stable codes; translate them here (presentation layer).
+        const { fields, summary } = describe(result.error);
+        let shownOnField = false;
+
+        for (const [field, message] of fields) {
+          if (!FORM_FIELDS.has(field)) continue;
+          setError(field as keyof BookFormValues, { type: 'server', message });
+          shownOnField = true;
+        }
+
+        if (!shownOnField) toast.error(summary);
+        return;
+      }
+
+      toast.success(tGeneral('bookCreated'));
+      router.push(routes.ADMIN.BOOKS);
+    });
+  };
+
   return (
     <div className="">
       <FormProvider {...methods}>
-        <form
-          className="flex flex-col md:flex-row gap-6 w-full"
-          onSubmit={handleSubmit((values) => {
-            console.log('Values', values);
-          })}
-        >
+        <form className="flex flex-col md:flex-row gap-6 w-full" onSubmit={handleSubmit(submit)}>
           <LeftSideForm />
-          <RightSideForm />
+          <RightSideForm isPending={isPending} />
         </form>
       </FormProvider>
     </div>
@@ -72,7 +135,7 @@ const LeftSideForm: React.FC = () => {
           isRequired
         />
         <FormSelect
-          name="author"
+          name="authorId"
           label={t('author')}
           options={[
             { label: 'Author1', value: '1' },
@@ -91,7 +154,7 @@ const LeftSideForm: React.FC = () => {
         />
         <div className="flex flex-col md:flex-row gap-4 w-full items-center">
           <FormSelect
-            name="category"
+            name="categoryId"
             label={t('category')}
             options={[
               { label: 'Fiction', value: '1' },
@@ -145,9 +208,10 @@ const LeftSideForm: React.FC = () => {
   );
 };
 
-const RightSideForm: React.FC = () => {
+const RightSideForm: React.FC<{ isPending: boolean }> = ({ isPending }) => {
   const t = useTranslations('BookForm');
   const tGeneral = useTranslations('General');
+  const router = useRouter();
   const { control } = useFormContext();
   return (
     <div className="w-full md:w-1/2 flex flex-col gap-6">
@@ -180,8 +244,17 @@ const RightSideForm: React.FC = () => {
         </CardContent>
       </Card>
       <div className="flex w-full items-center justify-end gap-1">
-        <Button variant="secondary">{tGeneral('cancel')}</Button>
-        <Button type="submit">{tGeneral('save')}</Button>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={isPending}
+          onClick={() => router.push(routes.ADMIN.BOOKS)}
+        >
+          {tGeneral('cancel')}
+        </Button>
+        <Button type="submit" disabled={isPending}>
+          {tGeneral('save')}
+        </Button>
       </div>
     </div>
   );
