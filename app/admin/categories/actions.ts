@@ -2,7 +2,7 @@
 
 import { createCategory, deleteCategory, updateCategory } from '@/db/categories';
 import { getTranslations } from 'next-intl/server';
-import { revalidatePath } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { z } from 'zod';
 import { categorySchema } from './form-schemas';
 
@@ -16,7 +16,7 @@ export const createCategoryAction = async (formData: FormData) => {
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   await createCategory(parsed.data.name);
-  revalidatePath('/admin/categories');
+  updateTag('categories');
   return { error: null };
 };
 
@@ -25,7 +25,7 @@ export const updateCategoryAction = async (id: string, formData: FormData) => {
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
   await updateCategory(id, parsed.data.name);
-  revalidatePath('/admin/categories');
+  updateTag('categories');
   return { error: null };
 };
 
@@ -34,5 +34,5 @@ export const deleteCategoryAction = async (formData: FormData) => {
   if (typeof id !== 'string' || !z.uuid().safeParse(id).success) return;
 
   await deleteCategory(id);
-  revalidatePath('/admin/categories');
+  updateTag('categories');
 };

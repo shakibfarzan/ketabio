@@ -1,10 +1,14 @@
 import { AppError, NotFoundError } from '@/lib/errors';
 import { asc, eq } from 'drizzle-orm';
+import { cacheLife, cacheTag } from 'next/cache';
 import { db } from '..';
 import { categories } from '../schema';
 import { Category } from './types';
 
 export const listCategories = async (): Promise<Category[]> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag('categories');
   try {
     return await db.select().from(categories).orderBy(asc(categories.name));
   } catch (error) {
