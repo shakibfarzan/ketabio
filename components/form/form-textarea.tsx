@@ -9,6 +9,8 @@ type Props<T extends FieldValues> = FormProps<T> & {
   placeholder?: string;
   className?: string;
   fieldDescription?: string;
+  /** Text direction of the field itself — Persian inputs stay RTL inside an LTR form. */
+  dir?: 'rtl' | 'ltr';
 };
 
 function FormTextarea<T extends FieldValues>({
@@ -19,6 +21,7 @@ function FormTextarea<T extends FieldValues>({
   placeholder,
   control,
   isRequired,
+  dir,
 }: Props<T>) {
   return (
     <Controller
@@ -32,6 +35,7 @@ function FormTextarea<T extends FieldValues>({
           </FieldLabel>
           <Textarea
             {...field}
+            dir={dir}
             id={field.name}
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}

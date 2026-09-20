@@ -3,7 +3,7 @@
 import { deleteCategoryAction } from '@/app/admin/categories/actions';
 import Container from '@/components/container';
 import { Button } from '@/components/ui/button';
-import type { Category } from '@/db/categories';
+import type { AdminCategory } from '@/db/categories';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
@@ -11,7 +11,7 @@ import AdminCategoriesTopSection from './admin-categories-top-section';
 import CategoryModal from './category-modal';
 
 type Props = {
-  categories: Category[];
+  categories: AdminCategory[];
 };
 
 const CategoriesManager = ({ categories }: Props) => {
@@ -19,14 +19,14 @@ const CategoriesManager = ({ categories }: Props) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
 
   const openCreateDialog = () => {
     setEditingCategory(null);
     setIsOpen(true);
   };
 
-  const openEditDialog = (category: Category) => {
+  const openEditDialog = (category: AdminCategory) => {
     setEditingCategory(category);
     setIsOpen(true);
   };
@@ -52,6 +52,7 @@ const CategoriesManager = ({ categories }: Props) => {
           <div className="divide-y rounded-lg border">
             {categories.map((category) => (
               <div key={category.id} className="flex items-center justify-between gap-4 p-4">
+                {/* Already localized for the current locale by `listCategoriesForAdmin`. */}
                 <span className="font-medium">{category.name}</span>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => openEditDialog(category)}>

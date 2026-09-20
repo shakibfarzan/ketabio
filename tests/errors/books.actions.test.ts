@@ -12,21 +12,24 @@ type Actions = typeof import('@/app/admin/books/actions');
 let currentUser: { role: 'admin' | 'member' } | null = null;
 let repoCreate: (...args: unknown[]) => Promise<unknown> = async () => ({ id: 'b1', slug: 'x' });
 
-mock.module(path.resolve('utils/auth.ts'), {
-  namedExports: {
-    requireAdmin: async () => {
-      const { UnauthorizedError, ForbiddenError } = await import('@/lib/errors/app-error');
-      if (!currentUser) throw new UnauthorizedError();
-      if (currentUser.role !== 'admin') throw new ForbiddenError();
-      return currentUser;
-    },
+mock.module(path.resolve('lib/auth/require-admin.ts'), {
+  defaultExport: async () => {
+    const { UnauthorizedError, ForbiddenError } = await import('@/lib/errors/app-error');
+    if (!currentUser) throw new UnauthorizedError();
+    if (currentUser.role !== 'admin') throw new ForbiddenError();
+    return currentUser;
   },
 });
 mock.module(path.resolve('utils/config-files.ts'), {
   namedExports: { uploadFile: async () => 'https://cdn.example.com/file' },
 });
-mock.module('next/cache', { namedExports: { revalidatePath: () => {} } });
-mock.module(path.resolve('db/books.ts'), {
+mock.module('next/cache', {
+  namedExports: { revalidatePath: () => {}, updateTag: () => {} },
+});
+mock.module(path.resolve('lib/request-locale.ts'), {
+  namedExports: { getRequestLocale: async () => 'en' },
+});
+mock.module(path.resolve('db/books/mutations.ts'), {
   namedExports: {
     createBook: (...args: unknown[]) => repoCreate(...args),
     updateBook: async () => {
@@ -35,17 +38,23 @@ mock.module(path.resolve('db/books.ts'), {
     deleteBook: async () => {
       throw new Error('should not be called');
     },
+  },
+});
+mock.module(path.resolve('db/books/queries.ts'), {
+  namedExports: {
     getBookBySlug: async () => {
       throw new Error('should not be called');
     },
-    listBooks: async () => [],
+    paginateBooks: async () => ({ items: [], total: 0, page: 1, pageSize: 20, totalPages: 1 }),
   },
 });
 
 const validForm = () => {
   const fd = new FormData();
-  fd.set('title', 'Clean Code');
-  fd.set('description', 'desc');
+  fd.set('translations.en.title', 'Clean Code');
+  fd.set('translations.en.description', 'desc');
+  fd.set('translations.fa.title', 'کد تمیز');
+  fd.set('translations.fa.description', 'توضیحات');
   fd.set('language', 'English');
   fd.set('authorId', '00000000-0000-4000-8000-000000000000');
   fd.set('categoryId', '00000000-0000-4000-8000-000000000001');
@@ -74,38 +83,74 @@ describe('books server actions', () => {
 
   it('forbidden request -> FORBIDDEN', async () => {
     currentUser = { role: 'member' };
-    assert.deepEqual(await actions.updateBookAction('x', {}), {
+    assert.deepEqual(await actions.updateBookAction('x', new FormData()), {
       success: false,
       error: { code: 'FORBIDDEN' },
     });
   });
 
-  it('invalid input -> VALIDATION_ERROR with field codes (uploads skipped)', async () => {
+  it('invalid input -> VALIDATION_ERROR with per-locale field codes (uploads skipped)', async () => {
     currentUser = { role: 'admin' };
+    repoCreate = async () => ({ id: 'b1', slug: 'x' });
+
     const fd = validForm();
-    fd.set('title', 'a');
+    fd.set('translations.en.title', 'a');
     fd.set('authorId', 'not-a-uuid');
     fd.delete('categoryId');
     assert.deepEqual(await actions.createBookAction(fd), {
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        fields: { title: 'TOO_SHORT', authorId: 'INVALID_UUID', categoryId: 'REQUIRED' },
+        fields: {
+          'translations.en.title': 'TOO_SHORT',
+          authorId: 'INVALID_UUID',
+          categoryId: 'REQUIRED',
+        },
       },
     });
 
     const noFiles = new FormData();
-    noFiles.set('title', 'Clean Code');
+    noFiles.set('translations.en.title', 'Clean Code');
     const result = await actions.createBookAction(noFiles);
     assert.equal(result.success, false);
     if (result.success) return;
     assert.deepEqual(result.error.fields, { coverImage: 'REQUIRED', bookFile: 'REQUIRED' });
   });
 
-  it('successful creation', async () => {
+  it('a missing fallback-locale title is rejected on its own field', async () => {
     currentUser = { role: 'admin' };
-    const result = await actions.createBookAction(validForm());
-    assert.deepEqual(result, { success: true, data: { id: 'b1', slug: 'x' } });
+    const fd = validForm();
+    fd.delete('translations.en.title');
+    fd.set('translations.fa.title', 'کد تمیز');
+
+    assert.deepEqual(await actions.createBookAction(fd), {
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        fields: { 'translations.en.title': 'REQUIRED' },
+      },
+    });
+  });
+
+  it('successful creation forwards every locale to the repository', async () => {
+    currentUser = { role: 'admin' };
+    let received: unknown;
+    repoCreate = async (input: unknown) => {
+      received = input;
+      return { id: 'b1', slug: 'x' };
+    };
+
+    assert.deepEqual(await actions.createBookAction(validForm()), {
+      success: true,
+      data: { id: 'b1', slug: 'x' },
+    });
+
+    const { translations } = received as {
+      translations: Record<string, { title: string; description?: string }>;
+    };
+    assert.deepEqual(Object.keys(translations).sort(), ['en', 'fa']);
+    assert.equal(translations.fa.title, 'کد تمیز');
+    assert.equal(translations.en.title, 'Clean Code');
   });
 
   it('duplicate slug -> field-level BOOK_SLUG_EXISTS', async () => {

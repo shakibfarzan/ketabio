@@ -4,6 +4,7 @@ import { Controller, FieldValues } from 'react-hook-form';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import RequiredSign from '@/components/form/required-sign';
 import { useLocale } from 'use-intl';
+import { isRtl } from '@/constants/locales';
 import { Option } from '@/components/form/form-select';
 import MultiSelect from '@/components/ui/multi-select';
 
@@ -25,7 +26,7 @@ function FormMultiSelect<T extends FieldValues>({
   isMultiSelect = true,
 }: Props<T>) {
   const locale = useLocale();
-  const isPersian = locale === 'fa';
+  const isPersian = isRtl(locale);
   return (
     <Controller
       name={name}

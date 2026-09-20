@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import RequiredSign from '@/components/form/required-sign';
 import { useLocale } from 'use-intl';
+import { isRtl } from '@/constants/locales';
 
 export type Option = {
   label: string | ((value: string) => React.ReactNode);
@@ -33,7 +34,7 @@ function FormSelect<T extends FieldValues>({
   isRequired,
 }: Props<T>) {
   const locale = useLocale();
-  const isPersian = locale === 'fa';
+  const isPersian = isRtl(locale);
   return (
     <Controller
       name={name}

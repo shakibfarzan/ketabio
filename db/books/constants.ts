@@ -3,4 +3,5 @@ export const BOOKS_CONSTRAINTS = {
   BOOKS_SLUG_UNIQUE: 'books_slug_unique',
   BOOKS_AUTHOR_FK: 'books_author_id_authors_id_fk',
   BOOK_CATEGORIES_CATEGORY_FK: 'book_categories_category_id_categories_id_fk',
+  BOOK_TRANSLATIONS_UNIQUE: 'book_translations_book_id_locale_unique',
 } as const;

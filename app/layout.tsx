@@ -6,8 +6,9 @@ import { enUS, faIR } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
+import { isRtl } from '@/constants/locales';
+import { getRequestLocale } from '@/lib/request-locale';
 import { Poppins, Vazirmatn } from 'next/font/google';
-import { cookies } from 'next/headers';
 import React from 'react';
 import './globals.css';
 
@@ -33,9 +34,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const store = await cookies();
-  const locale = store.get('locale')?.value || 'en';
-  const isPersian = locale === 'fa';
+  const locale = await getRequestLocale();
+  const isPersian = isRtl(locale);
   const clerkLocale = isPersian ? faIR : enUS;
   return (
     <ClerkProvider localization={clerkLocale}>
