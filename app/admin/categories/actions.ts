@@ -1,6 +1,7 @@
 'use server';
 
 import { createCategory, deleteCategory, updateCategory } from '@/db/categories';
+import safeAction from '@/utils/safe-action';
 import { getTranslations } from 'next-intl/server';
 import { updateTag } from 'next/cache';
 import { z } from 'zod';
@@ -14,25 +15,26 @@ const parseCategory = async (formData: FormData) => {
 export const createCategoryAction = async (formData: FormData) => {
   const parsed = await parseCategory(formData);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-
-  await createCategory(parsed.data.name);
-  updateTag('categories');
-  return { error: null };
+  return safeAction(async () => {
+    await createCategory(parsed.data.name);
+    updateTag('categories');
+  });
 };
 
 export const updateCategoryAction = async (id: string, formData: FormData) => {
   const parsed = await parseCategory(formData);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-
-  await updateCategory(id, parsed.data.name);
-  updateTag('categories');
-  return { error: null };
+  return safeAction(async () => {
+    await updateCategory(id, parsed.data.name);
+    updateTag('categories');
+  });
 };
 
 export const deleteCategoryAction = async (formData: FormData) => {
   const id = formData.get('id');
   if (typeof id !== 'string' || !z.uuid().safeParse(id).success) return;
-
-  await deleteCategory(id);
-  updateTag('categories');
+  return safeAction(async () => {
+    await deleteCategory(id);
+    updateTag('categories');
+  });
 };
