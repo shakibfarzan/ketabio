@@ -40,8 +40,8 @@ const columnExists = async (table: string, column: string) =>
 
 describe('multilingual migrations (PGlite)', () => {
   before(async () => {
-    // Legacy database: `0000` + `0001`, tolerating the documented `book_files` FK failure
-    // (integer vs uuid — see the comment in `0002_add_translation_tables.sql`).
+    // Legacy database: `0000` + `0001`. `0001` is now idempotent, but older checkouts typed
+    // `book_files.book_id` as integer (FK failure) — keep tolerating that for robustness.
     for (const tag of ['0000', '0001']) {
       const file = fs
         .readdirSync(MIGRATIONS_DIR)
