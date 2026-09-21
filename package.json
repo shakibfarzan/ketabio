@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "tsx --experimental-test-module-mocks --test 'tests/**/*.test.ts'",
     "format": "prettier --write .",
-    "migrate": "drizzle-kit generate & drizzle-kit migrate & drizzle-kit push",
+    "migrate": "drizzle-kit generate && drizzle-kit migrate",
+    "migrate:push": "drizzle-kit push",
+    "seed": "tsx db/seed.ts",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "dependencies": {

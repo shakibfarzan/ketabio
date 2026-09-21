@@ -10,21 +10,18 @@ import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { setCookie } from '@/utils/client-cookies';
+import { LOCALE_COOKIE, LOCALES, type Locale } from '@/constants/locales';
 import { useLocale } from 'use-intl';
 
-type Lang = {
-  lang: string;
-  title: string;
-  flagSrc: string;
+/** Flag asset per supported locale. Adding a locale to `LOCALES` requires an entry here. */
+const LOCALE_FLAGS: Record<Locale, string> = {
+  en: '/gb.svg',
+  fa: '/ir.svg',
 };
-
-const langs: Lang[] = [
-  { lang: 'en', title: 'English', flagSrc: '/gb.svg' },
-  { lang: 'fa', title: 'Persian', flagSrc: '/ir.svg' },
-];
 
 const SwitchLocale: React.FC = () => {
   const t = useTranslations('General');
+  const tLocales = useTranslations('Locales');
   const locale = useLocale();
   const [mounted, setMounted] = React.useState(false);
 
@@ -32,19 +29,19 @@ const SwitchLocale: React.FC = () => {
     setMounted(true);
   }, []);
 
-  const handleClick = (lang: string) => {
-    setCookie('locale', lang);
+  const handleClick = (lang: Locale) => {
+    setCookie(LOCALE_COOKIE, lang);
     window.location.reload();
   };
 
   const trigger = (
     <Button variant="ghost" size="icon">
-      {langs.map(({ lang, flagSrc }) => (
+      {LOCALES.map((lang) => (
         <Image
           key={lang}
           className={locale !== lang ? 'hidden' : 'rounded'}
-          src={flagSrc}
-          alt={lang}
+          src={LOCALE_FLAGS[lang]}
+          alt={tLocales(lang)}
           width={25}
           height={25}
         />
@@ -61,9 +58,9 @@ const SwitchLocale: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {langs.map(({ title, lang }) => (
+        {LOCALES.map((lang) => (
           <DropdownMenuItem key={lang} onClick={() => handleClick(lang)}>
-            {t(title)}
+            {tLocales(lang)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

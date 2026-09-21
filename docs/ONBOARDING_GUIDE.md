@@ -95,13 +95,19 @@ ketabio/
 │   ├── form/                     # RHF-connected field wrappers
 │   ├── ui/                       # shadcn primitives
 │   └── file-uploader.tsx
-├── constants/routes.ts           # Central route constants
+├── constants/
+│   ├── locales.ts                # LOCALES, Locale, DEFAULT/FALLBACK_LOCALE, isRtl
+│   └── routes.ts                 # Central route constants
 ├── db/
-│   ├── schema.ts                 # Tables, enums, ROLES
+│   ├── schema.ts                 # Tables, enums, ROLES, Drizzle relations
 │   ├── index.ts                  # Drizzle + Neon client
-│   ├── books.ts                  # createBook helper
-│   └── users.ts                  # User type
-├── drizzle/                      # Generated migrations
+│   ├── translation-sql.ts        # Shared COALESCE / locale-resolution SQL fragments
+│   ├── seed.ts                   # Bilingual development seed (npm run seed)
+│   ├── books/                    # queries (localized), mutations, helpers, types
+│   ├── authors/                  # queries (localized), types
+│   ├── categories/               # queries (localized), mutations, helpers, types
+│   └── users/                    # queries, mutations, types
+├── drizzle/                      # Generated migrations (0002/0003 add the translation tables)
 ├── hooks/useLanguages.ts         # REST Countries language list
 ├── i18n/request.ts               # next-intl request config
 ├── lib/
@@ -325,7 +331,22 @@ Messages live in:
 - `messages/en.json`
 - `messages/fa.json`
 
-Namespaces in use include `General`, `LandingPage`, `Footer`, `Forms`, `BookForm`.
+Namespaces in use include `General`, `Locales`, `LandingPage`, `Footer`, `Forms`, `BookForm`.
+
+### Static copy vs. dynamic content
+
+`next-intl` only translates **static UI copy**. Anything stored in the database (book titles and
+descriptions, author names and bios, category names) is translated by the `*_translations` tables
+in `db/schema.ts`, one row per `(entity, locale)`.
+
+- `constants/locales.ts` is the single source of truth for the locale list; the `locale` Postgres
+  enum, the Zod schemas, the form blocks and the language switcher are all generated from it.
+- `lib/request-locale.ts` resolves the request locale from the cookie; the same value drives both
+  `next-intl` and the database queries.
+- Reads return already-localized objects (`LocalizedBook`, `LocalizedAuthor`,
+  `LocalizedCategory`), so components never touch a translation table.
+
+See [docs/I18N.md](I18N.md) for the full guide (schema rules, fallback order, adding a language).
 
 ### Theme
 
@@ -364,22 +385,34 @@ users (Clerk id)
 authors 1──* books
 categories *──* books (book_categories)
 books 1──* book_files   (format: pdf | epub | mobi | audio)
+
+authors     1──* author_translations     (one row per locale)
+categories  1──* category_translations   (one row per locale)
+books       1──* book_translations       (one row per locale, ON DELETE CASCADE)
 ```
 
 ### Tables (from `db/schema.ts`)
 
-| Table                     | Purpose                                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `users`                   | App profile + `role`                                                                                   |
-| `authors`                 | Book authors                                                                                           |
-| `categories`              | Taxonomy (`name`, `slug`)                                                                              |
-| `books`                   | Catalog core (`title`, `slug`, `description`, cover, language, pages, ISBN, `publishedAt`, `authorId`) |
-| `book_files`              | Downloadable assets per format                                                                         |
-| `book_categories`         | M2M books ↔ categories                                                                                 |
-| `shelves` / `shelf_books` | Member custom shelves                                                                                  |
-| `reading_progress`        | Page / percent tracking                                                                                |
-| `reviews`                 | Rating + optional content                                                                              |
-| `favorites`               | M2M user ↔ book                                                                                        |
+| Table                     | Purpose                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------ |
+| `users`                   | App profile + `role`                                                                       |
+| `authors`                 | Language-independent author data (`slug`, `avatarUrl`)                                     |
+| `author_translations`     | Author `name` / `bio` per locale, `UNIQUE(author_id, locale)`                              |
+| `categories`              | Taxonomy node (`slug`) — language-independent                                              |
+| `category_translations`   | Category `name` per locale, `UNIQUE(category_id, locale)` + `UNIQUE(locale, name)`         |
+| `books`                   | Catalog core (`slug`, cover, language, pages, ISBN, `publishedAt`, `authorId`)             |
+| `book_translations`       | Book `title` / `description` per locale, `UNIQUE(book_id, locale)`, cascade on book delete |
+| `book_files`              | Downloadable assets per format                                                             |
+| `book_categories`         | M2M books ↔ categories                                                                     |
+| `shelves` / `shelf_books` | Member custom shelves                                                                      |
+| `reading_progress`        | Page / percent tracking                                                                    |
+| `reviews`                 | Rating + optional content                                                                  |
+| `favorites`               | M2M user ↔ book                                                                            |
+
+Drizzle `relations()` are defined for `books`, `book_translations`, `authors`,
+`author_translations`, `categories`, `category_translations`, `book_categories` and `book_files`,
+so `Book → translations[] / author`, `Author → translations[] / books[]` and
+`Category → translations[] / bookCategories[]` are all typed.
 
 ### Migrations
 
@@ -387,19 +420,34 @@ books 1──* book_files   (format: pdf | epub | mobi | audio)
 - Existing SQL:
   - `0000_purple_guardsmen.sql` — initial domain
   - `0001_futuristic_red_wolf.sql` — `book_format` enum + `book_files`
+  - `0002_add_translation_tables.sql` — **additive**: creates the three translation tables, adds
+    `authors.slug`, backfills an `en` translation for every existing book/author/category, and
+    reconciles drift left behind by `0000`/`0001`. Idempotent, drops nothing.
+  - `0003_drop_legacy_language_columns.sql` — **destructive**: drops `books.title`,
+    `books.description`, `authors.name`, `authors.bio`, `categories.name`. Aborts with an exception
+    if any record still lacks a translation row.
 
-**Schema drift to be aware of:** migration `0001` historically typed `book_files.book_id` as `integer` while `books.id` is `uuid` and the TypeScript schema uses `uuid` with `onDelete: 'cascade'`. Fresh `push` from the TS schema is the source of truth for new environments; verify live DB types if an older migrate-only path was used.
+> **Use `npm run migrate`, not `drizzle-kit push`, for this change.** `push` applies the schema
+> diff directly and would drop the legacy columns _without_ running the backfill in `0002`,
+> losing every title and description. `npm run migrate:push` is kept for fresh, empty databases
+> only.
+>
+> `0001` typed `book_files.book_id` as `integer` while `books.id` is `uuid`; PostgreSQL rejects
+> such a foreign key, so that migration never produced a usable `book_files` table. `0002`
+> recreates the table with the correct type when it detects the old one.
 
 ### Book creation helper
 
-`db/books.ts` → `createBook`:
+`db/books/mutations.ts` → `createBook`:
 
-1. `slugify(title)`; if slug taken, append `-1`, `-2`, …
-2. Insert book row
-3. Insert category join rows from `categoriesIds`
-4. Insert `bookFiles` rows with the new `bookId`
+1. `slugify(primaryTitle(translations))` — the **fallback-locale** title, because slugs are
+   language-independent and `utils/slugify.ts` is Latin-only; if the slug is taken, append `-1`,
+   `-2`, …
+2. Generate the book id with `randomUUID()`
+3. Insert the book row, one `book_translations` row per filled locale, the `book_categories` join
+   rows and the `book_files` rows — **all in one `db.batch()`**, so a failure rolls everything back
 
-Slug utility (`utils/slugify.ts`) lowercases, strips non-word characters, and collapses whitespace to hyphens. **Persian titles may slug poorly** (non-Latin letters stripped) — a known product/tech risk.
+Slug utility (`utils/slugify.ts`) lowercases, strips non-word characters, and collapses whitespace to hyphens. **Persian titles may slug poorly** (non-Latin letters stripped) — which is why the slug is derived from the English title.
 
 ---
 
@@ -428,37 +476,44 @@ export const uploadFile = async (file: File) => {
 
 ### Routes (`constants/routes.ts`)
 
-| Constant                | Path                       | Status                     |
-| ----------------------- | -------------------------- | -------------------------- |
-| `ADMIN.BASE`            | `/admin`                   | Redirects to books         |
-| `ADMIN.BOOKS`           | `/admin/books`             | Placeholder body (`Hello`) |
-| `ADMIN.ADD_BOOK`        | `/admin/books/add`         | Renders `BookForm`         |
-| `ADMIN.EDIT_BOOK(slug)` | `/admin/books/edit/[slug]` | Empty stub                 |
+| Constant                | Path                       | Status                                           |
+| ----------------------- | -------------------------- | ------------------------------------------------ |
+| `ADMIN.BASE`            | `/admin`                   | Redirects to books                               |
+| `ADMIN.BOOKS`           | `/admin/books`             | Localized list: search, pagination, edit, delete |
+| `ADMIN.ADD_BOOK`        | `/admin/books/add`         | Renders `BookForm` (create)                      |
+| `ADMIN.EDIT_BOOK(slug)` | `/admin/books/edit/[slug]` | Renders `BookForm` prefilled from every locale   |
 
 ### Book form (`app/admin/books/_components/book-form.tsx`)
 
 Client component using:
 
-- `react-hook-form` + `zodResolver(bookFormSchema(t))`
-- Fields: title, author, description, category, language, ISBN, publishedAt, pageCount, coverImage, bookFile
-- Shared form controls under `components/form/*`
-- Languages loaded client-side from REST Countries (`hooks/useLanguages.ts`)
-- Author and category options are **hardcoded placeholders**, not DB-backed
-- Submit handler logs values only
+- `react-hook-form` + `zodResolver(bookFormSchema(t, { isEdit }))`
+- A **Translations** card with one block per locale (rendered from `LOCALES`): English title and
+  description are required, other locales are optional
+- Language-independent fields: author, category, language, ISBN, publishedAt, pageCount,
+  coverImage, bookFile
+- Author and category options are loaded from the database in the admin's locale by the
+  `add` / `edit` pages (no more hardcoded placeholders)
+- Submits `translations.<locale>.<field>` form entries, so a new language needs no form changes
 
 ### Validation (`lib/validators/book.schema.ts`)
 
-Zod object with i18n error messages from the `Forms` namespace. Cover and book file are required `z.file()` values. Language is optional string array (UI uses single-select multi-select component with `isMultiSelect={false}`).
+Two layers:
 
-### Server action stub
+- `bookFormSchema(t)` — client-side, translated messages from the `Forms` namespace, one nested
+  object per locale
+- `createBookSchema` / `updateBookSchema` — server-side, stable `FIELD_ERROR_CODES` only. Its
+  `translations` field is `z.partialRecord(z.enum(LOCALES), …)` refined so the **fallback locale
+  must carry a title**; every other locale is optional.
 
-```ts
-// app/admin/books/actions.ts
-'use server';
-export const createBookAction = async () => {};
-```
+Nested validation paths are joined with dots (`translations.en.title`), so each locale's input
+gets its own error slot.
 
-Wire this to validation, Pinata upload, and `createBook` as the primary vertical slice for finishing admin create.
+### Server actions (`app/admin/books/actions.ts`)
+
+`createBookAction`, `updateBookAction`, `deleteBookAction`, `getBookAction`, `listBooksAction`.
+All follow: authorize → validate (Zod codes) → repository → `ActionResult`. Reads resolve the
+request locale with `getRequestLocale()` and return already-localized data.
 
 ---
 
@@ -490,14 +545,18 @@ Root metadata references `manifest: '/manifest.webmanifest'` (Next may emit from
 
 ## 14. Commands cheat sheet
 
-| Command           | Purpose                               |
-| ----------------- | ------------------------------------- |
-| `npm run dev`     | Next.js development server            |
-| `npm run build`   | Production build + typecheck          |
-| `npm run start`   | Serve production build                |
-| `npm run lint`    | ESLint                                |
-| `npm run format`  | Prettier write across repo            |
-| `npm run migrate` | drizzle-kit generate & migrate & push |
+| Command                | Purpose                                                    |
+| ---------------------- | ---------------------------------------------------------- |
+| `npm run dev`          | Next.js development server                                 |
+| `npm run build`        | Production build + typecheck                               |
+| `npm run start`        | Serve production build                                     |
+| `npm run lint`         | ESLint                                                     |
+| `npm run typecheck`    | `tsc --noEmit`                                             |
+| `npm test`             | Node test runner + PGlite (migrations, seed, repositories) |
+| `npm run format`       | Prettier write across repo                                 |
+| `npm run migrate`      | `drizzle-kit generate && drizzle-kit migrate`              |
+| `npm run migrate:push` | `drizzle-kit push` — empty/throwaway databases only        |
+| `npm run seed`         | Bilingual sample catalog (`db/seed.ts`)                    |
 
 ---
 
@@ -510,33 +569,36 @@ Root metadata references `manifest: '/manifest.webmanifest'` (Next may emit from
 - [x] Clerk webhook skeleton for user create/delete
 - [x] `getOrCreateUser` sync path
 - [x] EN/FA messages, RTL, fonts, Clerk locale
+- [x] **Multilingual dynamic content** (`book/author/category_translations`, locale fallback,
+      localized queries, per-locale search) — see [docs/I18N.md](I18N.md)
 - [x] Dark / light / system theme
-- [x] Drizzle schema for full library domain
-- [x] Migrations folder with two generations
-- [x] Admin shell + add-book form UI + Zod schema
-- [x] `createBook` DB helper + slugify
+- [x] Drizzle schema for full library domain + relations
+- [x] Migrations folder (four generations; the last two carry the translation refactor)
+- [x] Admin shell + add/edit book form + Zod schemas (server and client)
+- [x] Admin books list with localized title/author/category, search, pagination, delete
+- [x] Admin category manager with per-locale names
+- [x] Book server actions wired to DB + Pinata
+- [x] Bilingual seed (`npm run seed`)
 - [x] Pinata helper
 - [x] PWA + manifest scaffolding
 - [x] File dropzone component
 
 ### Incomplete or stubbed
 
-- [ ] `createBookAction` and form submit → DB/Pinata
-- [ ] Admin books **list** (query, table, pagination, search)
-- [ ] Admin book **edit** page and update/delete actions
-- [ ] Author/category management UIs (form uses fake options)
-- [ ] Admin **authorization** (role check on routes/actions)
+- [ ] **Author management** — there is no author CRUD (UI or repository mutations); authors are
+      created by the seed only
+- [ ] Admin book **edit** does not replace the book file (only the cover image)
+- [ ] Admin **authorization** on pages (actions do check `requireAdmin`)
 - [ ] Member catalog browse, detail, borrow flows
+- [ ] Public `/books` and `/books/[slug]` pages do not exist yet (footer links point at them)
 - [ ] Shelves, favorites, reviews, reading progress **features** (tables only)
 - [ ] `UserProvider` exists but is not wired into the root tree
 - [ ] Nav links for Categories / About still point at `/`
 - [ ] Featured books on landing are static UI, not DB-driven
 - [ ] Webhook does not handle `user.updated`
-- [ ] Possible `book_files.book_id` type mismatch in older SQL migration
-- [ ] `slugify` weak for non-Latin titles
-- [ ] `npm run migrate` uses `&` (background) rather than `&&` (sequential) — prefer fixing to `&&` for reliability
+- [ ] `slugify` is Latin-only; slugs are therefore generated from the English title only
 - [ ] `utils/config-files.ts` starts with `'server only'` string (convention is usually `import 'server-only'` package)
-- [ ] Layout imports `ROLES` / `getOrCreateUser` patterns inconsistently (navbar does the user fetch; unused imports may exist in layout depending on revision)
+- [ ] Search uses `ILIKE '%…%'`; a `pg_trgm` GIN index is the upgrade path if the catalog grows
 
 ### Product vs schema
 

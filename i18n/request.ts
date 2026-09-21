@@ -1,9 +1,14 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies } from 'next/headers';
+import { getRequestLocale } from '@/lib/request-locale';
 
+/**
+ * next-intl request config: static UI copy for the current locale.
+ *
+ * The locale comes from the same helper the database layer uses (`lib/request-locale.ts`), so the
+ * UI language and the language dynamic content is read in are always the same.
+ */
 export default getRequestConfig(async () => {
-  const store = await cookies();
-  const locale = store.get('locale')?.value || 'en';
+  const locale = await getRequestLocale();
 
   return {
     locale,

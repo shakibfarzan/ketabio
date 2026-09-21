@@ -10,6 +10,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useLocale } from 'use-intl';
+import { isRtl } from '@/constants/locales';
 
 type Props<T extends FieldValues> = FormProps<T> & {
   placeholder?: string;
@@ -25,7 +26,7 @@ function FormDatePicker<T extends FieldValues>({
   isRequired,
 }: Props<T>) {
   const locale = useLocale();
-  const isPersian = locale === 'fa';
+  const isPersian = isRtl(locale);
   return (
     <Controller
       name={name}

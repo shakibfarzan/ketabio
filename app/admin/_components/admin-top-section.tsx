@@ -4,6 +4,7 @@ import TopSection from '@/components/top-section';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useLocale } from 'next-intl';
+import { isRtl } from '@/constants/locales';
 
 type Props = {
   title: string;
@@ -13,7 +14,7 @@ type Props = {
 
 const AdminTopSection: React.FC<Props> = ({ buttonTitle, onAddClicked, title }) => {
   const locale = useLocale();
-  const isPersian = locale === 'fa';
+  const isPersian = isRtl(locale);
   return (
     <TopSection
       title={title}

@@ -12,6 +12,8 @@ type Props<T extends FieldValues> = FormProps<T> & {
   step?: number;
   placeholder?: string;
   className?: string;
+  /** Text direction of the field itself — Persian inputs stay RTL inside an LTR form. */
+  dir?: 'rtl' | 'ltr';
 };
 
 function FormInput<T extends FieldValues>({
@@ -25,6 +27,7 @@ function FormInput<T extends FieldValues>({
   placeholder,
   isRequired,
   className = '',
+  dir,
 }: Props<T>) {
   const isNumber = type === 'number';
   return (
@@ -39,6 +42,7 @@ function FormInput<T extends FieldValues>({
           <Input
             {...field}
             type={type}
+            dir={dir}
             id={field.name}
             min={isNumber ? min : undefined}
             max={isNumber ? max : undefined}

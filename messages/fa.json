@@ -13,8 +13,6 @@
     "light": "روشن",
     "system": "سیستم",
     "byAuthor": "توسط {author}",
-    "English": "انگلیسی",
-    "Persian": "فارسی",
     "switchLanguage": "تغییر زبان",
     "library": "کتابخانه",
     "home": "صفحه اصلی",
@@ -38,7 +36,22 @@
     "edit": "ویرایش",
     "delete": "حذف",
     "deleteCategoryConfirmation": "این دسته‌بندی حذف شود؟ این دسته‌بندی از تمام کتاب‌ها حذف خواهد شد.",
-    "bookCreated": "کتاب با موفقیت ایجاد شد"
+    "bookCreated": "کتاب با موفقیت ایجاد شد",
+    "editBook": "ویرایش کتاب",
+    "bookUpdated": "کتاب با موفقیت به‌روزرسانی شد",
+    "bookDeleted": "کتاب حذف شد",
+    "noBooks": "هنوز کتابی وجود ندارد.",
+    "search": "جستجو",
+    "searchBooksPlaceholder": "جستجو بر اساس عنوان یا توضیحات",
+    "pageInfo": "صفحه {page} از {totalPages}",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "deleteBookConfirmation": "این کتاب حذف شود؟ ترجمه‌های آن نیز حذف خواهند شد.",
+    "unknown": "نامشخص"
+  },
+  "Locales": {
+    "en": "انگلیسی",
+    "fa": "فارسی"
   },
   "LandingPage": {
     "title": "کتاب های مورد علاقه تان، فقط چند کلیک فاصله دارند",
@@ -106,7 +119,10 @@
     "pageCountPlaceholder": "تعداد صفحات را وارد کنید",
     "isbnPlaceholder": "ISBN را وارد کنید",
     "coverImage": "تصویر جلد",
-    "bookFile": "فایل کتاب"
+    "bookFile": "فایل کتاب",
+    "translations": "ترجمه‌ها",
+    "translationsHint": "عنوان و توضیحات را به هر زبان وارد کنید. انگلیسی الزامی است؛ در صورت نبود یک زبان، به انگلیسی برگشت داده می‌شود.",
+    "required": "الزامی"
   },
   "errors": {
     "INTERNAL_ERROR": "مشکلی پیش آمد. لطفاً دوباره تلاش کنید.",
@@ -122,6 +138,8 @@
     "BOOK_UPDATE_FAILED": "به‌روزرسانی کتاب با خطا مواجه شد.",
     "BOOK_DELETE_FAILED": "حذف کتاب با خطا مواجه شد.",
     "BOOK_FETCH_FAILED": "بارگذاری کتاب‌ها با خطا مواجه شد.",
+    "AUTHOR_NOT_FOUND": "نویسنده پیدا نشد.",
+    "AUTHOR_FETCH_FAILED": "بارگذاری نویسندگان با خطا مواجه شد.",
     "CATEGORY_NOT_FOUND": "دسته‌بندی پیدا نشد.",
     "CATEGORY_NAME_EXISTS": "دسته‌بندی با این نام از قبل وجود دارد.",
     "CATEGORY_SLUG_EXISTS": "دسته‌بندی با این اسلاگ از قبل وجود دارد.",

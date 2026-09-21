@@ -13,8 +13,6 @@
     "light": "Light",
     "system": "System",
     "byAuthor": "by {author}",
-    "English": "English",
-    "Persian": "Persian",
     "switchLanguage": "Switch Language",
     "library": "Library",
     "home": "Home",
@@ -38,7 +36,22 @@
     "edit": "Edit",
     "delete": "Delete",
     "deleteCategoryConfirmation": "Delete this category? It will be removed from all books.",
-    "bookCreated": "Book created successfully"
+    "bookCreated": "Book created successfully",
+    "editBook": "Edit Book",
+    "bookUpdated": "Book updated successfully",
+    "bookDeleted": "Book deleted",
+    "noBooks": "No books yet.",
+    "search": "Search",
+    "searchBooksPlaceholder": "Search by title or description",
+    "pageInfo": "Page {page} of {totalPages}",
+    "previous": "Previous",
+    "next": "Next",
+    "deleteBookConfirmation": "Delete this book? Its translations will be removed too.",
+    "unknown": "Unknown"
+  },
+  "Locales": {
+    "en": "English",
+    "fa": "Persian"
   },
   "LandingPage": {
     "title": "Your favorite books, just a few clicks away",
@@ -106,7 +119,10 @@
     "pageCountPlaceholder": "Enter page count",
     "isbnPlaceholder": "Enter ISBN",
     "coverImage": "Cover Image",
-    "bookFile": "Book File"
+    "bookFile": "Book File",
+    "translations": "Translations",
+    "translationsHint": "Enter the title and description in each language. English is required; a missing language falls back to English.",
+    "required": "required"
   },
   "errors": {
     "INTERNAL_ERROR": "Something went wrong. Please try again.",
@@ -122,6 +138,8 @@
     "BOOK_UPDATE_FAILED": "Failed to update the book.",
     "BOOK_DELETE_FAILED": "Failed to delete the book.",
     "BOOK_FETCH_FAILED": "Failed to load books.",
+    "AUTHOR_NOT_FOUND": "Author not found.",
+    "AUTHOR_FETCH_FAILED": "Failed to load authors.",
     "CATEGORY_NOT_FOUND": "Category not found.",
     "CATEGORY_NAME_EXISTS": "A category with this name already exists.",
     "CATEGORY_SLUG_EXISTS": "A category with this slug already exists.",

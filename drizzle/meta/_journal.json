@@ -15,6 +15,20 @@
       "when": 1771482146111,
       "tag": "0001_futuristic_red_wolf",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789886294671,
+      "tag": "0002_add_translation_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789886455246,
+      "tag": "0003_drop_legacy_language_columns",
+      "breakpoints": true
     }
   ]
 }
