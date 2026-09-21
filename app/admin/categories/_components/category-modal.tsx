@@ -28,7 +28,7 @@ type Props = {
   category: AdminCategory | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSaved: () => void;
+  onSaved?: () => void;
 };
 
 const toDefaultValues = (category: AdminCategory | null): CategoryFormValues => {
@@ -73,7 +73,7 @@ const CategoryModal = ({ category, open, onOpenChange, onSaved }: Props) => {
       }
 
       onOpenChange(false);
-      onSaved();
+      onSaved?.();
     });
   };
 
@@ -89,7 +89,6 @@ const CategoryModal = ({ category, open, onOpenChange, onSaved }: Props) => {
               <span className="text-sm font-medium">{tLocales(locale)}</span>
               <FormInput
                 control={control}
-                dir={isRtl(locale) ? 'rtl' : 'ltr'}
                 isRequired={locale === FALLBACK_LOCALE}
                 label={t('categoryName')}
                 max={100}

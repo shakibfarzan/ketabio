@@ -1,13 +1,14 @@
 import Footer from '@/components/footer';
 import Navbar from '@/components/navbar';
 import { Toaster } from '@/components/ui/sonner';
+import { isRtl } from '@/constants/locales';
+import { getRequestLocale } from '@/lib/request-locale';
+import { cn } from '@/lib/utils';
 import ThemeProvider from '@/providers/theme-provider';
 import { enUS, faIR } from '@clerk/localizations';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { isRtl } from '@/constants/locales';
-import { getRequestLocale } from '@/lib/request-locale';
 import { Poppins, Vazirmatn } from 'next/font/google';
 import React from 'react';
 import './globals.css';
@@ -15,9 +16,9 @@ import './globals.css';
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-poppins',
 });
-const vazirMatn = Vazirmatn({ subsets: ['arabic'], variable: '--font-fa' });
+const vazirMatn = Vazirmatn({ subsets: ['arabic'], variable: '--font-vazir' });
 
 export const metadata: Metadata = {
   title: 'Ketabio',
@@ -42,7 +43,7 @@ export default async function RootLayout({
       <html
         lang={locale}
         dir={isPersian ? 'rtl' : 'ltr'}
-        className={isPersian ? vazirMatn.className : poppins.className}
+        className={cn(poppins.variable, vazirMatn.variable)}
         suppressHydrationWarning
       >
         <body>

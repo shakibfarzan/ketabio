@@ -38,7 +38,6 @@ const CategoriesManager = ({ categories }: Props) => {
       const formData = new FormData();
       formData.set('id', id);
       await deleteCategoryAction(formData);
-      router.refresh();
     });
   };
 
@@ -52,7 +51,6 @@ const CategoriesManager = ({ categories }: Props) => {
           <div className="divide-y rounded-lg border">
             {categories.map((category) => (
               <div key={category.id} className="flex items-center justify-between gap-4 p-4">
-                {/* Already localized for the current locale by `listCategoriesForAdmin`. */}
                 <span className="font-medium">{category.name}</span>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => openEditDialog(category)}>
@@ -74,12 +72,7 @@ const CategoriesManager = ({ categories }: Props) => {
         )}
       </Container>
 
-      <CategoryModal
-        category={editingCategory}
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        onSaved={() => router.refresh()}
-      />
+      <CategoryModal category={editingCategory} open={isOpen} onOpenChange={setIsOpen} />
     </>
   );
 };

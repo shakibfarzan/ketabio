@@ -1,11 +1,13 @@
 'use client';
 
-import * as React from 'react';
 import { Dialog as DialogPrimitive } from 'radix-ui';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { isRtl } from '@/constants/locales';
+import { cn } from '@/lib/utils';
 import { XIcon } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
@@ -47,6 +49,8 @@ function DialogContent({
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean;
 }) {
+  const locale = useLocale();
+  const isRTL = isRtl(locale);
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -61,7 +65,11 @@ function DialogContent({
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button variant="ghost" className="absolute top-4 right-4" size="icon-sm">
+            <Button
+              variant="ghost"
+              className={cn('absolute top-4', isRTL ? 'left-4' : 'right-4')}
+              size="icon-sm"
+            >
               <XIcon />
               <span className="sr-only">Close</span>
             </Button>
@@ -138,5 +146,6 @@ export {
   DialogOverlay,
   DialogPortal,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 };
+

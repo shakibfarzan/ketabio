@@ -99,6 +99,10 @@ export const getCategoryRow = async (id: string): Promise<Category> => {
 
 /** A category plus every one of its translations — what the admin manager needs to edit in place. */
 export const listCategoriesForAdmin = async (locale: Locale): Promise<AdminCategory[]> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag('categories');
+
   const [rows, translations] = await Promise.all([
     listCategories(locale),
     db.select().from(categoryTranslations).orderBy(asc(categoryTranslations.locale)),
