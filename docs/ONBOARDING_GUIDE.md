@@ -159,7 +159,7 @@ Apply the schema:
 npm run migrate
 ```
 
-The `migrate` script runs `drizzle-kit generate`, `migrate`, and `push` in sequence (via `&` in `package.json` — see [known gaps](#15-current-status-and-known-gaps) if that behaves oddly on your shell).
+The `migrate` script runs `drizzle-kit generate && drizzle-kit migrate`. Do not use `npm run migrate:push` (`drizzle-kit push`) on a database that already has tables or data — see [Migrations](#migrations) and [Troubleshooting](#18-troubleshooting).
 
 Start the app:
 
@@ -432,9 +432,11 @@ so `Book → translations[] / author`, `Author → translations[] / books[]` and
 > losing every title and description. `npm run migrate:push` is kept for fresh, empty databases
 > only.
 >
-> `0001` typed `book_files.book_id` as `integer` while `books.id` is `uuid`; PostgreSQL rejects
-> such a foreign key, so that migration never produced a usable `book_files` table. `0002`
-> recreates the table with the correct type when it detects the old one.
+> `0001` originally typed `book_files.book_id` as `integer` while `books.id` is `uuid`; PostgreSQL
+> rejected that foreign key, so the migration failed half-way and left the `book_format` enum
+> (and sometimes the table) behind without recording itself as applied. `0001` has since been
+> rewritten to be idempotent (`IF NOT EXISTS` everywhere, correct `uuid` type) so `migrate` can
+> recover such databases, and `0002` recreates the table if it still has the old column type.
 
 ### Book creation helper
 
@@ -703,6 +705,8 @@ Ordered for onboarding momentum:
 | Wrong language or LTR/RTL                     | Cookie not set / stale tab             | Use locale switcher; check `locale` cookie; hard refresh                                   |
 | PWA weirdness in dev                          | Expected                               | `next-pwa` is disabled in development                                                      |
 | `migrate` does nothing useful                 | `&` backgrounds commands               | Run `npx drizzle-kit generate && npx drizzle-kit migrate && npx drizzle-kit push` manually |
+| `push` fails: `column "book_id" cannot be cast automatically to type uuid` (`42804`) | DB still has the broken `book_files` from the old `0001` (`integer` FK) | Run `npm run migrate` (`0002` recreates the table), or `DROP TABLE book_files;` then push — it never held valid rows |
+| `migrate` fails: `type "book_format" already exists` (`42710`) | Old `0001` created the enum, then failed on its FK before being recorded in `drizzle.__drizzle_migrations` | Pull latest (`0001` is now idempotent) and re-run `npm run migrate` |
 | Types/build errors on book form               | Zod 4 `z.file` / RHF versions          | Align with locked `package-lock.json`; run `npm run build`                                 |
 
 ---
