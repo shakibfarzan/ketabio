@@ -15,9 +15,18 @@ import './globals.css';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  subsets: ['latin'],
+  // Latin glyphs only — Poppins renders English/Latin text. It has no
+  // Persian glyphs, so Persian characters automatically fall through to Vazirmatn.
+  subsets: ['latin', 'latin-ext'],
   variable: '--font-poppins',
 });
+// Arabic subset only — this is where the Persian glyphs live. Latin text is
+// handled by Poppins (listed first in the font stack), so Vazirmatn's Latin
+// files are never needed.
+//
+// Both fonts are loaded unconditionally (never per-locale) so mixed content —
+// e.g. a Persian book title shown inside the English UI — always renders each
+// script in its own font. See `--font-sans` in globals.css.
 const vazirMatn = Vazirmatn({ subsets: ['arabic'], variable: '--font-vazir' });
 
 export const metadata: Metadata = {

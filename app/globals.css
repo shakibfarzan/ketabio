@@ -38,7 +38,12 @@
   --sidebar-accent-foreground: oklch(0.3729 0.0306 259.7328);
   --sidebar-border: oklch(0.9276 0.0058 264.5313);
   --sidebar-ring: oklch(0.7227 0.192 149.5793);
-  --font-sans: DM Sans, sans-serif;
+  /* Locale-independent script fonts: the browser picks a font per character,
+     so Latin text renders in Poppins and Persian text in Vazirmatn — even when
+     both appear in the same sentence, regardless of the active locale. */
+  --font-sans: var(--font-poppins), var(--font-vazir), ui-sans-serif, system-ui, sans-serif;
+  --font-en: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-fa: var(--font-vazir), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-serif: Lora, serif;
   --font-mono: IBM Plex Mono, monospace;
   --radius: 0.5rem;
@@ -93,7 +98,9 @@
   --sidebar-accent-foreground: oklch(0.7118 0.0129 286.0665);
   --sidebar-border: oklch(0.4461 0.0263 256.8018);
   --sidebar-ring: oklch(0.7729 0.1535 163.2231);
-  --font-sans: DM Sans, sans-serif;
+  --font-sans: var(--font-poppins), var(--font-vazir), ui-sans-serif, system-ui, sans-serif;
+  --font-en: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-fa: var(--font-vazir), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   --font-serif: Lora, serif;
   --font-mono: IBM Plex Mono, monospace;
   --radius: 0.5rem;
@@ -148,6 +155,8 @@
   --color-sidebar-ring: var(--sidebar-ring);
 
   --font-sans: var(--font-sans);
+  --font-en: var(--font-en);
+  --font-fa: var(--font-fa);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
 
@@ -171,7 +180,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    font-family: var(--font-poppins), var(--font-vazir), sans-serif;
+    font-family: var(--font-sans);
     @apply bg-background text-foreground;
   }
 }
