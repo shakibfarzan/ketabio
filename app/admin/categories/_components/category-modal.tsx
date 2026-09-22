@@ -86,14 +86,14 @@ const CategoryModal = ({ category, open, onOpenChange, onSaved }: Props) => {
         <form className="space-y-6" onSubmit={handleSubmit(submitCategory)}>
           {LOCALES.map((locale) => (
             <div className="flex flex-col gap-2" key={locale}>
-              <span className="text-sm font-medium">{tLocales(locale)}</span>
               <FormInput
                 control={control}
                 isRequired={locale === FALLBACK_LOCALE}
-                label={t('categoryName')}
+                label={`${tLocales(locale)} ${t('categoryName')}`}
                 max={100}
                 name={`translations.${locale}.name` as Path<CategoryFormValues>}
                 placeholder={t('categoryNamePlaceholder')}
+                inputClassName={isRtl(locale) ? 'font-fa' : ''}
               />
             </div>
           ))}

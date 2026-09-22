@@ -1,9 +1,9 @@
-import React from 'react';
-import { Controller, FieldValues } from 'react-hook-form';
+import RequiredSign from '@/components/form/required-sign';
+import { FormProps } from '@/components/form/types';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { FormProps } from '@/components/form/types';
-import RequiredSign from '@/components/form/required-sign';
+import React from 'react';
+import { Controller, FieldValues } from 'react-hook-form';
 
 type Props<T extends FieldValues> = FormProps<T> & {
   type?: React.HTMLInputTypeAttribute;
@@ -14,6 +14,7 @@ type Props<T extends FieldValues> = FormProps<T> & {
   className?: string;
   /** Text direction of the field itself — Persian inputs stay RTL inside an LTR form. */
   dir?: 'rtl' | 'ltr';
+  inputClassName?: string;
 };
 
 function FormInput<T extends FieldValues>({
@@ -28,6 +29,7 @@ function FormInput<T extends FieldValues>({
   isRequired,
   className = '',
   dir,
+  inputClassName = '',
 }: Props<T>) {
   const isNumber = type === 'number';
   return (
@@ -50,6 +52,7 @@ function FormInput<T extends FieldValues>({
             value={field.value ?? ''}
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
+            className={inputClassName}
             onChange={(e) => {
               if (!isNumber) {
                 field.onChange(e);

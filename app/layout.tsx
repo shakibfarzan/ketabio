@@ -55,7 +55,7 @@ export default async function RootLayout({
         className={cn(poppins.variable, vazirMatn.variable)}
         suppressHydrationWarning
       >
-        <body>
+        <body className={isPersian ? 'font-fa' : 'font-en'}>
           <NextIntlClientProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <Navbar />
