@@ -199,12 +199,15 @@ const attachTranslations = async (rows: LocalizedCategory[]): Promise<AdminCateg
 
 /**
  * Paginated, filterable, sortable admin category list. Every page item carries the full, unresolved
- * translation list so the admin can edit in place. Reflects live data (no `'use cache'`).
+ * translation list so the admin can edit in place.
  */
 export const listCategoriesForAdmin = async (
   locale: Locale,
   options: CategoryListOptions = {}
 ): Promise<CategoryPage> => {
+  'use cache';
+  cacheLife('days');
+  cacheTag('categories');
   const { page, pageSize } = normalizePaging(options);
   try {
     const [rows, total] = await Promise.all([

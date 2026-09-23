@@ -1,12 +1,11 @@
 'use client';
 
-import { deleteCategoryAction } from '@/app/admin/categories/actions';
 import Container from '@/components/container';
-import { Button } from '@/components/ui/button';
 import type { AdminCategory, CategoryPage } from '@/db/categories';
 import { useTranslations } from 'next-intl';
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import AdminCategoriesTopSection from './admin-categories-top-section';
+import CategoriesList from './categories-list';
 import CategoryModal from './category-modal';
 
 type Props = {
@@ -15,7 +14,6 @@ type Props = {
 
 const CategoriesManager = ({ categories }: Props) => {
   const t = useTranslations('General');
-  const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
 
@@ -29,44 +27,18 @@ const CategoriesManager = ({ categories }: Props) => {
     setIsOpen(true);
   };
 
-  const removeCategory = (id: string) => {
-    if (!window.confirm(t('deleteCategoryConfirmation'))) return;
-
-    startTransition(async () => {
-      const formData = new FormData();
-      formData.set('id', id);
-      await deleteCategoryAction(formData);
-    });
-  };
-
   return (
     <>
       <AdminCategoriesTopSection onAddClicked={openCreateDialog} />
       <Container>
-        {categories?.total === 0 ? (
-          <p className="text-muted-foreground">{t('noCategories')}</p>
+        {categories && categories.total > 0 ? (
+          <CategoriesList
+            categories={categories.items}
+            total={categories.total}
+            onEdit={openEditDialog}
+          />
         ) : (
-          <div className="divide-y rounded-lg border">
-            {categories?.items.map((category) => (
-              <div key={category.id} className="flex items-center justify-between gap-4 p-4">
-                <span className="font-medium">{category.name}</span>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => openEditDialog(category)}>
-                    {t('edit')}
-                  </Button>
-                  <Button
-                    disabled={isPending}
-                    size="sm"
-                    type="button"
-                    variant="destructive"
-                    onClick={() => removeCategory(category.id)}
-                  >
-                    {t('delete')}
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <p className="text-muted-foreground">{t('noCategories')}</p>
         )}
       </Container>
 

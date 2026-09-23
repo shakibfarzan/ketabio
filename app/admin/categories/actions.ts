@@ -1,6 +1,7 @@
 'use server';
 
 import { LOCALES, type Locale } from '@/constants/locales';
+import { parseDataTableParams } from '@/components/data-table/data-table-params';
 import {
   createCategory,
   deleteCategory,
@@ -59,13 +60,29 @@ export const deleteCategoryAction = async (formData: FormData) => {
 };
 
 /**
- * Paginated admin category list. Validates every option (stable `VALIDATION_ERROR` code on bad
+ * Paginated admin category list. Every option is serialized by the DataTable into the URL
+ * (`q`, `sort`, `dir`, `page`, `pageSize`), parsed back here through `parseDataTableParams`,
+ * then mapped to the domain options. Validates everything (stable `VALIDATION_ERROR` code on bad
  * input), enforces an admin session, and returns already-localized categories plus their full
  * translations for in-place editing.
  */
-export const listCategoriesAction = async (input: CategoryListOptions = {}) =>
+export const listCategoriesAction = async (
+  input: Readonly<Record<string, string | string[] | undefined>> = {}
+) =>
   safeAction(async (): Promise<CategoryPage> => {
-    const parsedInput = categoryListOptionsSchema.safeParse(input);
+    const tableParams = parseDataTableParams(input);
+    const options: CategoryListOptions = {
+      ...(tableParams.search ? { search: tableParams.search } : {}),
+      ...(tableParams.sort
+        ? {
+            sort: tableParams.sort.id === 'createdAt' ? 'createdAt' : 'name',
+            order: tableParams.sort.dir,
+          }
+        : {}),
+      page: tableParams.page,
+      pageSize: tableParams.pageSize,
+    };
+    const parsedInput = categoryListOptionsSchema.safeParse(options);
     if (!parsedInput.success) throw new AppError('VALIDATION_ERROR');
     await requireAdmin();
     const locale = await getRequestLocale();
