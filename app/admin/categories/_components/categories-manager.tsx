@@ -30,7 +30,7 @@ const CategoriesManager = ({ categories }: Props) => {
   return (
     <>
       <AdminCategoriesTopSection onAddClicked={openCreateDialog} />
-      <Container>
+      <Container className="py-10">
         {categories && categories.total > 0 ? (
           <CategoriesList
             categories={categories.items}

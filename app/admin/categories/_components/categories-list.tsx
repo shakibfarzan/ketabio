@@ -38,7 +38,6 @@ const CategoriesList = ({ categories, total, onEdit }: Props) => {
     {
       id: 'createdAt',
       header: t('createdAt'),
-      sortDescFirst: true,
       cell: (category) =>
         category.createdAt
           ? format.dateTime(new Date(category.createdAt), { dateStyle: 'medium' })
