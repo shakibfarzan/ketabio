@@ -1,12 +1,31 @@
-import { FALLBACK_LOCALE, type Locale } from '@/constants/locales';
+import { FALLBACK_LOCALE, localeChain, type Locale } from '@/constants/locales';
 import { AppError, NotFoundError } from '@/lib/errors';
-import { and, asc, eq, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  ilike,
+  inArray,
+  sql,
+  type SQLWrapper,
+} from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 import { cacheLife, cacheTag } from 'next/cache';
 import { db } from '..';
 import { categories, categoryTranslations } from '../schema';
-import { localizedColumn, resolvedLocaleColumn } from '../translation-sql';
-import type { AdminCategory, Category, CategoryTranslation, LocalizedCategory } from './types';
+import { escapeLikePattern, localizedColumn, resolvedLocaleColumn } from '../translation-sql';
+import type {
+  AdminCategory,
+  Category,
+  CategoryListOptions,
+  CategoryPage,
+  CategorySortField,
+  CategoryTranslation,
+  LocalizedCategory,
+} from './types';
 
 const categoryTranslation = alias(categoryTranslations, 'category_translation');
 const categoryTranslationFallback = alias(categoryTranslations, 'category_translation_fallback');
@@ -15,8 +34,47 @@ const categoryTranslationFallback = alias(categoryTranslations, 'category_transl
 const categoryName = () =>
   localizedColumn<string | null>(categoryTranslation.name, categoryTranslationFallback.name);
 
-const selectCategories = (locale: Locale, id?: string) =>
-  db
+const DEFAULT_PAGE_SIZE = 10;
+const MAX_PAGE_SIZE = 100;
+
+const SORT_FIELDS: Record<CategorySortField, SQLWrapper> = {
+  name: sql`coalesce(${categoryTranslation.name}, ${categoryTranslationFallback.name})`,
+  createdAt: categories.createdAt,
+};
+
+const normalizePaging = (options: CategoryListOptions = {}) => {
+  const pageSize = Math.min(
+    Math.max(Math.trunc(options.pageSize ?? DEFAULT_PAGE_SIZE), 1),
+    MAX_PAGE_SIZE
+  );
+  const page = Math.max(Math.trunc(options.page ?? 1), 1);
+  return { page, pageSize };
+};
+
+/**
+ * Case-insensitive match against the translated name of the requested locale and of the fallback
+ * locale, so a search always covers what the user can see.
+ */
+const matchesSearch = (term: string, locale: Locale) =>
+  exists(
+    db
+      .select({ found: sql`1` })
+      .from(categoryTranslations)
+      .where(
+        and(
+          eq(categoryTranslations.categoryId, categories.id),
+          inArray(categoryTranslations.locale, localeChain(locale)),
+          ilike(categoryTranslations.name, escapeLikePattern(term))
+        )
+      )
+  );
+
+const selectCategories = (locale: Locale, id?: string, options: CategoryListOptions = {}) => {
+  const { page, pageSize } = normalizePaging(options);
+  const term = options.search?.trim();
+  const sort = SORT_FIELDS[options.sort ?? 'name'] ?? SORT_FIELDS.name;
+  const direction = options.order === 'desc' ? desc : asc;
+  const query = db
     .select({
       id: categories.id,
       slug: categories.slug,
@@ -36,9 +94,17 @@ const selectCategories = (locale: Locale, id?: string) =>
         eq(categoryTranslationFallback.locale, FALLBACK_LOCALE)
       )
     )
-    .where(id ? eq(categories.id, id) : undefined)
-    // Alphabetical by the localized name, as before the translation tables existed.
-    .orderBy(asc(sql`coalesce(${categoryTranslation.name}, ${categoryTranslationFallback.name})`));
+    .where(
+      and(id ? eq(categories.id, id) : undefined, term ? matchesSearch(term, locale) : undefined)
+    )
+    // Default: alphabetical by the localized name, as before the translation tables existed.
+    .orderBy(direction(sort), asc(categories.slug));
+
+  // Pagination is only applied when explicitly requested (public/read paths stay unbounded).
+  return options.page !== undefined || options.pageSize !== undefined
+    ? query.limit(pageSize).offset((page - 1) * pageSize)
+    : query;
+};
 
 const toLocalizedCategory = (row: Awaited<ReturnType<typeof selectCategories>>[number]) =>
   ({ ...row, name: row.name ?? '' }) satisfies LocalizedCategory;
@@ -97,26 +163,62 @@ export const getCategoryRow = async (id: string): Promise<Category> => {
   return category;
 };
 
-/** A category plus every one of its translations — what the admin manager needs to edit in place. */
-export const listCategoriesForAdmin = async (locale: Locale): Promise<AdminCategory[]> => {
-  'use cache';
-  cacheLife('days');
-  cacheTag('categories');
+const countCategories = async (locale: Locale, search?: string): Promise<number> => {
+  const term = search?.trim();
+  const [row] = await db
+    .select({ value: count() })
+    .from(categories)
+    .where(term ? matchesSearch(term, locale) : undefined);
+  return row?.value ?? 0;
+};
 
-  const [rows, translations] = await Promise.all([
-    listCategories(locale),
-    db.select().from(categoryTranslations).orderBy(asc(categoryTranslations.locale)),
-  ]);
-
+/** Second stage of the admin list: attach every translation of the page's categories. */
+const attachTranslations = async (rows: LocalizedCategory[]): Promise<AdminCategory[]> => {
   const grouped = new Map<string, CategoryTranslation[]>();
-  for (const translation of translations) {
-    const list = grouped.get(translation.categoryId) ?? [];
-    list.push(translation);
-    grouped.set(translation.categoryId, list);
+  const ids = rows.map((row) => row.id);
+
+  if (ids.length > 0) {
+    const translations = await db
+      .select()
+      .from(categoryTranslations)
+      .where(inArray(categoryTranslations.categoryId, ids))
+      .orderBy(asc(categoryTranslations.locale));
+
+    for (const translation of translations) {
+      const list = grouped.get(translation.categoryId) ?? [];
+      list.push(translation);
+      grouped.set(translation.categoryId, list);
+    }
   }
 
   return rows.map((category) => ({
     ...category,
     translations: grouped.get(category.id) ?? [],
   }));
+};
+
+/**
+ * Paginated, filterable, sortable admin category list. Every page item carries the full, unresolved
+ * translation list so the admin can edit in place. Reflects live data (no `'use cache'`).
+ */
+export const listCategoriesForAdmin = async (
+  locale: Locale,
+  options: CategoryListOptions = {}
+): Promise<CategoryPage> => {
+  const { page, pageSize } = normalizePaging(options);
+  try {
+    const [rows, total] = await Promise.all([
+      selectCategories(locale, undefined, { ...options, page, pageSize }),
+      countCategories(locale, options.search),
+    ]);
+    return {
+      items: await attachTranslations(rows.map(toLocalizedCategory)),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.max(Math.ceil(total / pageSize), 1),
+    };
+  } catch (error) {
+    throw new AppError('CATEGORY_FETCH_FAILED', { cause: error });
+  }
 };

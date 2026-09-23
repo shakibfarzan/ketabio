@@ -3,20 +3,18 @@
 import { deleteCategoryAction } from '@/app/admin/categories/actions';
 import Container from '@/components/container';
 import { Button } from '@/components/ui/button';
-import type { AdminCategory } from '@/db/categories';
+import type { AdminCategory, CategoryPage } from '@/db/categories';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import AdminCategoriesTopSection from './admin-categories-top-section';
 import CategoryModal from './category-modal';
 
 type Props = {
-  categories: AdminCategory[];
+  categories: CategoryPage | undefined;
 };
 
 const CategoriesManager = ({ categories }: Props) => {
   const t = useTranslations('General');
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(null);
@@ -45,11 +43,11 @@ const CategoriesManager = ({ categories }: Props) => {
     <>
       <AdminCategoriesTopSection onAddClicked={openCreateDialog} />
       <Container>
-        {categories.length === 0 ? (
+        {categories?.total === 0 ? (
           <p className="text-muted-foreground">{t('noCategories')}</p>
         ) : (
           <div className="divide-y rounded-lg border">
-            {categories.map((category) => (
+            {categories?.items.map((category) => (
               <div key={category.id} className="flex items-center justify-between gap-4 p-4">
                 <span className="font-medium">{category.name}</span>
                 <div className="flex gap-2">

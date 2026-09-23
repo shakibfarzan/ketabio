@@ -9,7 +9,8 @@ const safeAction = async <T>(callback: () => Promise<T>): SafeActionResult<T> =>
     const res = await callback();
     return { res, error: null };
   } catch (e) {
-    return { error: t((e as AppError).code) };
+    const key = (e as AppError).code;
+    return { error: t.has(key) ? t(key) : key };
   }
 };
 export default safeAction;

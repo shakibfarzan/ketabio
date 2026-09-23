@@ -1,7 +1,17 @@
 'use server';
 
 import { LOCALES, type Locale } from '@/constants/locales';
-import { createCategory, deleteCategory, updateCategory } from '@/db/categories';
+import {
+  createCategory,
+  deleteCategory,
+  listCategoriesForAdmin,
+  updateCategory,
+} from '@/db/categories';
+import type { CategoryListOptions, CategoryPage } from '@/db/categories/types';
+import requireAdmin from '@/lib/auth/require-admin';
+import { AppError } from '@/lib/errors';
+import { getRequestLocale } from '@/lib/request-locale';
+import { categoryListOptionsSchema } from '@/lib/validators/category.schema';
 import safeAction from '@/utils/safe-action';
 import { getTranslations } from 'next-intl/server';
 import { updateTag } from 'next/cache';
@@ -47,3 +57,18 @@ export const deleteCategoryAction = async (formData: FormData) => {
     updateTag('categories');
   });
 };
+
+/**
+ * Paginated admin category list. Validates every option (stable `VALIDATION_ERROR` code on bad
+ * input), enforces an admin session, and returns already-localized categories plus their full
+ * translations for in-place editing.
+ */
+export const listCategoriesAction = async (input: CategoryListOptions = {}) =>
+  safeAction(async (): Promise<CategoryPage> => {
+    const parsedInput = categoryListOptionsSchema.safeParse(input);
+    if (!parsedInput.success) throw new AppError('VALIDATION_ERROR');
+    await requireAdmin();
+    const locale = await getRequestLocale();
+
+    return listCategoriesForAdmin(locale, parsedInput.data);
+  });
