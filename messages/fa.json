@@ -158,5 +158,21 @@
     "INVALID_DATE": "تاریخ وارد شده معتبر نیست",
     "MUST_BE_INTEGER": "باید عدد صحیح باشد",
     "MUST_BE_POSITIVE": "باید عددی بزرگ‌تر از صفر باشد"
+  },
+  "DataTable": {
+    "searchPlaceholder": "جستجو...",
+    "clearFilters": "پاک کردن همه فیلترها",
+    "columns": "ستون‌ها",
+    "showHideColumns": "نمایش/پنهان‌سازی ستون‌ها",
+    "sortAscending": "مرتب‌سازی صعودی",
+    "sortDescending": "مرتب‌سازی نزولی",
+    "hideColumn": "پنهان‌سازی ستون",
+    "rowsPerPage": "ردیف در هر صفحه",
+    "showingOf": "نمایش {from} تا {to} از {total}",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "noResults": "نتیجه‌ای یافت نشد.",
+    "noData": "داده‌ای موجود نیست.",
+    "loading": "در حال بارگذاری..."
   }
 }

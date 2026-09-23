@@ -158,5 +158,21 @@
     "INVALID_DATE": "Invalid date",
     "MUST_BE_INTEGER": "Must be an integer",
     "MUST_BE_POSITIVE": "Must be a positive number"
+  },
+  "DataTable": {
+    "searchPlaceholder": "Search...",
+    "clearFilters": "Clear all filters",
+    "columns": "Columns",
+    "showHideColumns": "Show/Hide columns",
+    "sortAscending": "Sort ascending",
+    "sortDescending": "Sort descending",
+    "hideColumn": "Hide column",
+    "rowsPerPage": "Rows per page",
+    "showingOf": "Showing {from}-{to} of {total}",
+    "previous": "Previous",
+    "next": "Next",
+    "noResults": "No results found.",
+    "noData": "No data available.",
+    "loading": "Loading..."
   }
 }
