@@ -11,6 +11,8 @@ import {
 import { cn } from '@/lib/utils';
 import { ArrowDownIcon, ArrowUpIcon, ChevronsUpDownIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useTransition } from 'react';
+import { Skeleton } from '../ui/skeleton';
 import DataFilter from './data-filter';
 import DataPagination from './data-pagination';
 import type { DataTableColumn } from './types';
@@ -32,26 +34,33 @@ export function DataTable<TData>({
   className,
 }: DataTableProps<TData>) {
   const t = useTranslations('DataTable');
+  const [isPending, startTransition] = useTransition();
   const { params, patchParams } = useDataTableUrl();
   const sort = params.sort;
 
   const toggleSort = (col: DataTableColumn<TData>) => {
-    const dir =
-      sort?.id !== col.id
-        ? col.sortDescFirst
-          ? 'desc'
-          : 'asc'
-        : sort.dir === 'asc'
-          ? 'desc'
-          : undefined;
-    patchParams({ sort: dir ? { id: col.id, dir } : undefined });
+    startTransition(() => {
+      const dir =
+        sort?.id !== col.id
+          ? col.sortDescFirst
+            ? 'desc'
+            : 'asc'
+          : sort.dir === 'asc'
+            ? 'desc'
+            : undefined;
+      patchParams({ sort: dir ? { id: col.id, dir } : undefined });
+    });
   };
 
   const filterColumns = columns.filter((col) => col.filter && col.filter.length > 0);
 
   return (
     <div className={cn('w-full', className)}>
-      <DataFilter filterColumns={filterColumns} />
+      <DataFilter
+        filterColumns={filterColumns}
+        isPending={isPending}
+        startTransition={startTransition}
+      />
       <Table aria-label={ariaLabel}>
         <TableHeader>
           <TableRow>
@@ -101,6 +110,14 @@ export function DataTable<TData>({
                 {t('noData')}
               </TableCell>
             </TableRow>
+          ) : isPending ? (
+            Array.from({ length: 10 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell colSpan={columns.length} className="h-12">
+                  <Skeleton className="h-full" />
+                </TableCell>
+              </TableRow>
+            ))
           ) : (
             data.map((row, index) => (
               <TableRow key={index}>
@@ -117,7 +134,7 @@ export function DataTable<TData>({
           )}
         </TableBody>
       </Table>
-      <DataPagination total={total} />
+      <DataPagination total={total} isPending={isPending} startTransition={startTransition} />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { PlusIcon, SearchIcon, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import React from 'react';
+import React, { TransitionStartFunction } from 'react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import {
@@ -20,9 +20,15 @@ import { useDataTableUrl } from './use-data-table-url';
 
 type Props<TData> = {
   filterColumns: DataTableColumn<TData>[];
+  startTransition: TransitionStartFunction;
+  isPending: boolean;
 };
 
-export default function DataFilter<TData>({ filterColumns }: Props<TData>) {
+export default function DataFilter<TData>({
+  filterColumns,
+  isPending,
+  startTransition,
+}: Props<TData>) {
   const t = useTranslations('DataTable');
   const { params, patchParams } = useDataTableUrl();
   const [draft, setDraft] = React.useState(params.search ?? '');
@@ -30,7 +36,10 @@ export default function DataFilter<TData>({ filterColumns }: Props<TData>) {
 
   React.useEffect(() => {
     if (debounced === (params.search ?? '')) return;
-    patchParams({ search: debounced || undefined });
+
+    startTransition(() => {
+      patchParams({ search: debounced || undefined });
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounced, patchParams]);
 
@@ -40,14 +49,16 @@ export default function DataFilter<TData>({ filterColumns }: Props<TData>) {
   );
 
   const toggleFilter = (colId: string, value: string) => {
-    const filters = { ...(params.filters ?? {}) };
-    const selected = filters[colId] ?? [];
-    const next = selected.includes(value)
-      ? selected.filter((v) => v !== value)
-      : [...selected, value];
-    if (next.length > 0) filters[colId] = next;
-    else delete filters[colId];
-    patchParams({ filters: Object.keys(filters).length > 0 ? filters : undefined });
+    startTransition(() => {
+      const filters = { ...(params.filters ?? {}) };
+      const selected = filters[colId] ?? [];
+      const next = selected.includes(value)
+        ? selected.filter((v) => v !== value)
+        : [...selected, value];
+      if (next.length > 0) filters[colId] = next;
+      else delete filters[colId];
+      patchParams({ filters: Object.keys(filters).length > 0 ? filters : undefined });
+    });
   };
 
   return (
