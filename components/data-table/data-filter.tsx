@@ -35,7 +35,7 @@ export default function DataFilter<TData>({
   const debounced = useDebouncedValue(draft, 300);
 
   React.useEffect(() => {
-    if (debounced === (params.search ?? '')) return;
+    if (debounced.trim() === (params.search?.trim() ?? '')) return;
 
     startTransition(() => {
       patchParams({ search: debounced || undefined });
