@@ -1,13 +1,17 @@
-import Container from '@/components/container';
-import AdminAuthorsTopSection from './_components/admin-authors-top-section';
+import AuthorsManager from './_components/authors-manager';
+import { listAuthorsAction } from './actions';
 
-const Authors = () => {
-  return (
-    <>
-      <AdminAuthorsTopSection />
-      <Container>Authors</Container>
-    </>
-  );
+export const instant = false;
+
+const AuthorsPage = async ({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) => {
+  const params = await searchParams;
+  const { res: authors } = await listAuthorsAction(params);
+
+  return <AuthorsManager authors={authors} />;
 };
 
-export default Authors;
+export default AuthorsPage;

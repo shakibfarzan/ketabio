@@ -50,7 +50,16 @@
     "previous": "قبلی",
     "next": "بعدی",
     "deleteBookConfirmation": "این کتاب حذف شود؟ ترجمه‌های آن نیز حذف خواهند شد.",
-    "unknown": "نامشخص"
+    "unknown": "نامشخص",
+    "editAuthor": "ویرایش نویسنده",
+    "authorName": "نام نویسنده",
+    "authorNamePlaceholder": "نام نویسنده را وارد کنید",
+    "authorBio": "زندگی‌نامه",
+    "authorBioPlaceholder": "یک زندگی‌نامه کوتاه وارد کنید",
+    "authorAvatar": "تصویر",
+    "noAuthors": "هنوز نویسنده‌ای وجود ندارد",
+    "searchAuthorsPlaceholder": "جستجو بر اساس نام",
+    "deleteAuthorConfirmation": "این نویسنده حذف شود؟ از کتاب‌هایش حذف خواهد شد."
   },
   "Locales": {
     "en": "انگلیسی",
@@ -102,7 +111,8 @@
     "invalidDate": "تاریخ وارد شده معتبر نیست",
     "invalidUuid": "شناسه معتبر نیست",
     "invalidFile": "فایل معتبر نیست",
-    "maxLength100": "حداکثر باید ۱۰۰ کاراکتر باشد"
+    "maxLength100": "حداکثر باید ۱۰۰ کاراکتر باشد",
+    "maxLength2000": "حداکثر باید ۲۰۰۰ کاراکتر باشد"
   },
   "BookForm": {
     "bookInformation": "اطلاعات کتاب",
@@ -160,7 +170,11 @@
     "INVALID_NUMBER": "باید یک عدد باشد",
     "INVALID_DATE": "تاریخ وارد شده معتبر نیست",
     "MUST_BE_INTEGER": "باید عدد صحیح باشد",
-    "MUST_BE_POSITIVE": "باید عددی بزرگ‌تر از صفر باشد"
+    "MUST_BE_POSITIVE": "باید عددی بزرگ‌تر از صفر باشد",
+    "AUTHOR_SLUG_EXISTS": "نویسنده‌ای با این اسلاگ از قبل وجود دارد.",
+    "AUTHOR_CREATE_FAILED": "ایجاد نویسنده با خطا مواجه شد.",
+    "AUTHOR_UPDATE_FAILED": "به‌روزرسانی نویسنده با خطا مواجه شد.",
+    "AUTHOR_DELETE_FAILED": "حذف نویسنده با خطا مواجه شد."
   },
   "DataTable": {
     "searchPlaceholder": "جستجو...",

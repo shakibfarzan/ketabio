@@ -16,5 +16,36 @@ export type AuthorTranslationsInput = Partial<Record<Locale, AuthorTranslationIn
  */
 export type LocalizedAuthor = Author & {
   name: string;
+  bio: string | null;
   locale: Locale | null;
+};
+
+/** Localized author plus its full translation list — used by the admin manager/edit dialog. */
+export type AdminAuthor = LocalizedAuthor & {
+  translations: AuthorTranslation[];
+};
+
+/** Fields the admin list can be ordered by. */
+export type AuthorSortField = 'name' | 'createdAt';
+
+/** Options for the paginated admin author list. */
+export type AuthorListOptions = {
+  /** Case-insensitive match on the translated name (requested + fallback locale). */
+  search?: string;
+  /** Field to order by; defaults to the localized `name`. */
+  sort?: AuthorSortField;
+  /** Sort direction; defaults to `asc`. */
+  order?: 'asc' | 'desc';
+  /** 1-based page number. */
+  page?: number;
+  pageSize?: number;
+};
+
+/** Paginated author list — what the admin authors manager renders. */
+export type AuthorPage = {
+  items: AdminAuthor[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 };
