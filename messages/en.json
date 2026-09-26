@@ -50,7 +50,16 @@
     "previous": "Previous",
     "next": "Next",
     "deleteBookConfirmation": "Delete this book? Its translations will be removed too.",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "editAuthor": "Edit Author",
+    "authorName": "Author name",
+    "authorNamePlaceholder": "Enter author name",
+    "authorBio": "Biography",
+    "authorBioPlaceholder": "Enter a short biography",
+    "authorAvatar": "Avatar",
+    "noAuthors": "No authors yet.",
+    "searchAuthorsPlaceholder": "Search by name",
+    "deleteAuthorConfirmation": "Delete this author? They will be removed from their books."
   },
   "Locales": {
     "en": "English",
@@ -102,7 +111,8 @@
     "invalidDate": "Invalid date",
     "invalidUuid": "Invalid identifier",
     "invalidFile": "Invalid file",
-    "maxLength100": "Must be at most 100 characters"
+    "maxLength100": "Must be at most 100 characters",
+    "maxLength2000": "Must be at most 2000 characters"
   },
   "BookForm": {
     "bookInformation": "Book Information",
@@ -160,7 +170,11 @@
     "INVALID_NUMBER": "Must be a number",
     "INVALID_DATE": "Invalid date",
     "MUST_BE_INTEGER": "Must be an integer",
-    "MUST_BE_POSITIVE": "Must be a positive number"
+    "MUST_BE_POSITIVE": "Must be a positive number",
+    "AUTHOR_SLUG_EXISTS": "An author with this slug already exists.",
+    "AUTHOR_CREATE_FAILED": "Failed to create the author.",
+    "AUTHOR_UPDATE_FAILED": "Failed to update the author.",
+    "AUTHOR_DELETE_FAILED": "Failed to delete the author."
   },
   "DataTable": {
     "searchPlaceholder": "Search...",
